@@ -13,7 +13,15 @@ import android.widget.Toast;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.OnEngineInitListener;
 import com.here.android.mpa.mapping.Map;
+import com.here.android.mpa.mapping.MapRoute;
 import com.here.android.mpa.mapping.SupportMapFragment;
+import com.here.android.mpa.routing.CoreRouter;
+import com.here.android.mpa.routing.RouteOptions;
+import com.here.android.mpa.routing.RoutePlan;
+import com.here.android.mpa.routing.RouteResult;
+import com.here.android.mpa.routing.RouteWaypoint;
+import com.here.android.mpa.routing.Router;
+import com.here.android.mpa.routing.RoutingError;
 import com.here2k19.projects.smartlastmilecommuter.R;
 
 import java.io.File;
@@ -21,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MapActivity extends FragmentActivity {
+public class MapActivity extends FragmentActivity implements CoreRouter.Listener {
 
     // permissions request code
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
@@ -37,7 +45,7 @@ public class MapActivity extends FragmentActivity {
 
     // map fragment embedded in this activity
     private SupportMapFragment mapFragment = null;
-
+CoreRouter coreRouter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +63,6 @@ public class MapActivity extends FragmentActivity {
 
         // Search for the map fragment to finish setup by calling init().
         mapFragment = getMapFragment();
-
         // Set up disk cache path for the map service for this application
         boolean success = com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(
                 getApplicationContext().getExternalFilesDir(null) + File.separator + ".here-maps",
@@ -75,12 +82,44 @@ public class MapActivity extends FragmentActivity {
                                 Map.Animation.NONE);
                         // Set the zoom level to the average between min and max
                         map.setZoomLevel((map.getMaxZoomLevel() + map.getMinZoomLevel()) / 2);
+           //             drawRoute();
+                        //coreRouter.calculateRoute(routePlan,new Rou);
+
                     } else {
                         System.out.println("ERROR: Cannot initialize Map Fragment");
                     }
                 }
             });
         }
+    }
+
+    private void drawRoute() {
+        coreRouter=new CoreRouter();
+        RoutePlan routePlan=new RoutePlan();
+        routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(49.1966286, -123.0053635)));
+        routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(49.1947289, -123.1762924)));
+        RouteOptions routeOptions = new RouteOptions();
+        routeOptions.setTransportMode(RouteOptions.TransportMode.CAR);
+        routeOptions.setRouteType(RouteOptions.Type.FASTEST);
+        routePlan.setRouteOptions(routeOptions);
+        coreRouter.calculateRoute(routePlan, new Router.Listener<List<RouteResult>, RoutingError>() {
+            @Override
+            public void onProgress(int i) {
+
+            }
+
+            @Override
+            public void onCalculateRouteFinished(List<RouteResult> routeResults, RoutingError routingError) {
+                if (routingError == RoutingError.NONE) {
+                    // Render the route on the map
+                    MapRoute mapRoute = new MapRoute(routeResults.get(0).getRoute());
+                    map.addMapObject(mapRoute);
+                }
+                else {
+                    // Display a message indicating route calculation failure
+                }
+            }
+        });
     }
 
 
@@ -129,4 +168,18 @@ public class MapActivity extends FragmentActivity {
         }
     }
 
+    @Override
+    public void onProgress(int i) {
+
+    }
+
+    @Override
+    public void onCalculateRouteFinished(List<RouteResult> list, RoutingError routingError) {
+        if (routingError == RoutingError.NONE) {
+            // Render the route on the map
+            MapRoute mapRoute = new MapRoute(list.get(0).getRoute());
+            map.addMapObject(mapRoute);
+        }
+    }
 }
+
