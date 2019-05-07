@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "255372102876",
+    "firebase_url": "https://language-settings-b708e.firebaseio.com",
+    "project_id": "language-settings-b708e",
+    "storage_bucket": "language-settings-b708e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:255372102876:android:37fd07037c8602f6",
+        "android_client_info": {
+          "package_name": "com.here2k19.projects.smartlastmilecommuter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "255372102876-aehkg6f23tqn977oucboq13n51jpdrth.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvLewbpyr9Er4WPsvJ0xlAWkIOjcNVdgs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "255372102876-aehkg6f23tqn977oucboq13n51jpdrth.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
