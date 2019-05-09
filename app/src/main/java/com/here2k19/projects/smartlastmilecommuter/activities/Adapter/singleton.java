@@ -1,4 +1,4 @@
-package com.here2k19.projects.smartlastmilecommuter.activities;
+package com.here2k19.projects.smartlastmilecommuter.activities.Adapter;
 
 import android.content.Context;
 

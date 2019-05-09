@@ -1,4 +1,4 @@
-package com.here2k19.projects.smartlastmilecommuter.activities;
+package com.here2k19.projects.smartlastmilecommuter.activities.BasicActivity;
 
 import android.Manifest;
 import android.content.Intent;
@@ -34,7 +34,7 @@ public class Login extends AppCompatActivity {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent=new Intent(Login.this,BusinessType.class);
+                Intent intent=new Intent(Login.this, BusinessType.class);
                 startActivity(intent);
             }
         },2000);

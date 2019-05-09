@@ -1,4 +1,4 @@
-package com.here2k19.projects.smartlastmilecommuter.activities;
+package com.here2k19.projects.smartlastmilecommuter.activities.Delivery;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

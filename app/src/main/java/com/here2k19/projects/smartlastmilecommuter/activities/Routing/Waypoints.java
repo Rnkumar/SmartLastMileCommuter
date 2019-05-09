@@ -1,4 +1,4 @@
-package com.here2k19.projects.smartlastmilecommuter.activities;
+package com.here2k19.projects.smartlastmilecommuter.activities.Routing;
 
 import android.content.Context;
 import android.util.Log;

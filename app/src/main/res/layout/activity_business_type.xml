@@ -5,7 +5,12 @@
     android:layout_width="match_parent"
     android:id="@+id/layout"
     android:layout_height="match_parent"
-    tools:context=".activities.BusinessType">
+    tools:context=".activities.BasicActivity.BusinessType">
+    <FrameLayout
+        android:id="@+id/simpleFrameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true" />
     <TextView
         android:textAlignment="center"
         android:text="select your type of business"
@@ -15,17 +20,7 @@
         android:textColor="#cf1020"
         android:layout_marginTop="120dp"
         />
-    <Button
-        android:id="@+id/geocode"
-      android:text="geocode"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content" />
-    <Button
-        android:id="@+id/reversegeocode"
-        android:text="reversegeocode"
-        android:layout_below="@id/geocode"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content" />
+
     <Button
     android:id="@+id/b2b"
     android:layout_centerVertical="true"

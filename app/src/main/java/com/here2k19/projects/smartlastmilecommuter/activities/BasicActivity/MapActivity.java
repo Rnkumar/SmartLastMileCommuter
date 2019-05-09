@@ -1,4 +1,4 @@
-package com.here2k19.projects.smartlastmilecommuter.activities;
+package com.here2k19.projects.smartlastmilecommuter.activities.BasicActivity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -51,7 +51,6 @@ CoreRouter coreRouter;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         checkPermissions();
-
     }
 
     public  SupportMapFragment getMapFragment() {
