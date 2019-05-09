@@ -17,12 +17,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activities.MapActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <activity android:name=".activities.GetDeliveries"></activity>
+        <activity android:name=".activities.Login" >
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+        </activity>
+        <activity android:name=".activities.BusinessType">
+
+        </activity>
+        <activity android:name=".activities.MapActivity">
+
         </activity>
 
         <meta-data
@@ -35,16 +42,14 @@
             android:name="com.here.android.maps.license.key"
             android:value="@string/license_key" />
 
-        <activity android:name=".activities.MainActivity">
-
-        </activity>
+        <activity android:name=".activities.MainActivity" />
 
         <service
             android:name="com.here.android.mpa.service.MapService"
             android:exported="false"
             android:label="BasicMapSolutionMapService">
             <intent-filter>
-                <action android:name="com.here2k19.projects.smartlastmilecommuter.MapService"></action>
+                <action android:name="com.here2k19.projects.smartlastmilecommuter.MapService" />
             </intent-filter>
         </service>
     </application>

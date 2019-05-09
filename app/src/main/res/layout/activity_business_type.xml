@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:id="@+id/layout"
+    android:layout_height="match_parent"
+    tools:context=".activities.BusinessType">
+    <TextView
+        android:textAlignment="center"
+        android:text="select your type of business"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:textColor="#cf1020"
+        android:layout_marginTop="120dp"
+        />
+    <Button
+        android:id="@+id/geocode"
+      android:text="geocode"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content" />
+    <Button
+        android:id="@+id/reversegeocode"
+        android:text="reversegeocode"
+        android:layout_below="@id/geocode"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content" />
+    <Button
+    android:id="@+id/b2b"
+    android:layout_centerVertical="true"
+    android:layout_marginLeft="50dp"
+    android:background="@drawable/round_button"
+    android:layout_width="130dp"
+    android:text="B2b"
+    android:textColor="#fff"
+    android:textSize="40dp"
+    android:layout_height="130dp" />
+    <Button
+        android:id="@+id/b2c"
+        android:layout_centerVertical="true"
+android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:background="@drawable/round_button"
+        android:layout_width="130dp"
+        android:text="B2c"
+        android:backgroundTint="#cf1020"
+        android:textColor="#fff"
+        android:textSize="40dp"
+        android:layout_height="130dp" />
+
+</RelativeLayout>

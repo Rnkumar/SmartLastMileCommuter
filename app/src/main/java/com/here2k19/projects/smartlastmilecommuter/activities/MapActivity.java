@@ -54,7 +54,8 @@ CoreRouter coreRouter;
 
     }
 
-    private SupportMapFragment getMapFragment() {
+    public  SupportMapFragment getMapFragment() {
+    Log.e("cll","called");
         return (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapfragment);
     }
 
