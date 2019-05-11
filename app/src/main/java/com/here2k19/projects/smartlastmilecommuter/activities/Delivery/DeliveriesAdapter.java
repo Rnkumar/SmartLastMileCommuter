@@ -1,6 +1,7 @@
 package com.here2k19.projects.smartlastmilecommuter.activities.Delivery;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.here2k19.projects.smartlastmilecommuter.R;
+import com.here2k19.projects.smartlastmilecommuter.activities.BasicActivity.MapActivity;
 
 import java.util.List;
 
@@ -32,14 +34,18 @@ public class DeliveriesAdapter extends RecyclerView.Adapter<DeliveriesAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
 Deliveries deliveries=productList.get(i);
 viewHolder.item.setText(deliveries.getItem());
 viewHolder.quantity.setText(deliveries.getQuantity());
+viewHolder.location.setText(deliveries.getLocation());
 viewHolder.bt.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
-        Toast.makeText(mCtx,"OkClicked",Toast.LENGTH_LONG).show();
+      //  Toast.makeText(mCtx,"OkClicked",Toast.LENGTH_LONG).show();
+        Intent intent=new Intent(mCtx, MapActivity.class);
+        intent.putExtra("admin_loc",viewHolder.location.getText().toString());
+        mCtx.startActivity(intent);
     }
 });
 viewHolder.bt1.setOnClickListener(new View.OnClickListener() {
@@ -56,12 +62,13 @@ viewHolder.bt1.setOnClickListener(new View.OnClickListener() {
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView item,quantity;
+        TextView item,quantity,location;
         Button bt,bt1;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             item=itemView.findViewById(R.id.itemvalue);
             quantity=itemView.findViewById(R.id.quantityvalue);
+            location=itemView.findViewById(R.id.locvalue);
             bt=itemView.findViewById(R.id.okbt);
             bt1=itemView.findViewById(R.id.clostbt);
         }

@@ -30,12 +30,12 @@ public class GetDeliveries extends AppCompatActivity  {
             recyclerView.setHasFixedSize(true);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
             productList = new ArrayList<>();
-            productList.add(new Deliveries("apple","50"));
-            productList.add(new Deliveries("orange","150"));
-            productList.add(new Deliveries("apple","50"));
-            productList.add(new Deliveries("orange","150"));
-            productList.add(new Deliveries("apple","50"));
-            productList.add(new Deliveries("orange","150"));
+            productList.add(new Deliveries("apple","50","kundrathur"));
+            productList.add(new Deliveries("orange","150","tambaram"));
+            productList.add(new Deliveries("apple","50","kundrathur"));
+            productList.add(new Deliveries("orange","150","tambaram"));
+            productList.add(new Deliveries("apple","50","kundrathur"));
+            productList.add(new Deliveries("orange","150","tambaram"));
             DeliveriesAdapter adapter=new DeliveriesAdapter(this,productList);
             recyclerView.setAdapter(adapter);
         }

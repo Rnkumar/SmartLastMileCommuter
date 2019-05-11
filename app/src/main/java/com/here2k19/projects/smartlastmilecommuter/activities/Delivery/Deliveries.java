@@ -4,9 +4,20 @@ public class Deliveries {
     private String item;
     private String Quantity;
 
-    public Deliveries(String item, String quantity) {
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    private String location;
+
+    public Deliveries(String item, String quantity,String location) {
         this.item = item;
         Quantity = quantity;
+    this.location=location;
     }
 
     public String getItem() {

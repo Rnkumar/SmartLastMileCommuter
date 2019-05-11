@@ -24,6 +24,7 @@ import com.here.android.mpa.search.Location;
 import com.here.android.mpa.search.ResultListener;
 import com.here.android.mpa.search.ReverseGeocodeRequest;
 import com.here2k19.projects.smartlastmilecommuter.R;
+import com.here2k19.projects.smartlastmilecommuter.activities.BasicActivity.MapActivity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -51,13 +52,18 @@ import org.json.JSONObject;
 public class MainView {
    // private static final Object TODO ="sdf" ;
     private AppCompatActivity m_activity;
+    MapActivity mapActivity;
     private TextView m_resultTextView;
     LocationManager locationManager;
     boolean initMap = false;
     PositioningManager posManager;
     public static String revvalue="";
+   public static String currentloclat,currentloclang=null;
     double lat, lang;
     int count=0;
+  public static boolean latlangvalue=false;
+    public static String latitude,longitude=null;
+    boolean mapAct=false;
 ProgressDialog progressDialog=null;
     public MainView(final AppCompatActivity activity) {
          progressDialog=new ProgressDialog(activity);
@@ -95,7 +101,10 @@ LocationListener locationListenerGPS=new LocationListener() {
            count=0;
        }
           if(initMap) {
-           triggerRevGeocodeRequest(location.getLatitude(), location.getLongitude());
+   MainView.currentloclat=""+location.getLatitude();
+MainView.currentloclang=""+location.getLongitude();
+Log.e("currentlat",currentloclat);
+triggerRevGeocodeRequest(location.getLatitude(), location.getLongitude());
            count++;
        }
        }
@@ -116,35 +125,88 @@ LocationListener locationListenerGPS=new LocationListener() {
 
     }
 };
+
+    public MainView(final MapActivity activity) {
+
+mapAct=true;
+        mapActivity = activity;
+        initMapEngine();
+        initUIElements();
+        //triggerRevGeocodeRequest(lat,lang);
+        Handler handler=new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+                if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                }
+                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
+                        2000,
+                        10, locationListenerGPS);
+            }
+        },2000);
+
+    }
+
     private void getCurrentLocation() {
 
     }
 
     private void initMapEngine() {
         // Set path of isolated disk cache
-        boolean success = com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(
-                m_activity.getExternalFilesDir(null) + File.separator + ".here-maps",
-                "com.here2k19.projects.smartlastmilecommuter.MapService");
-        if (!success) {
-            // Setting the isolated disk cache was not successful, please check if the path is valid and
-            // ensure that it does not match the default location
-            // (getExternalStorageDirectory()/.here-maps).
-            // Also, ensure the provided intent name does not match the default intent name.
-        } else {
-            /*
-             * Even though we don't display a map view in this application, in order to access any
-             * services that HERE Android SDK provides, the MapEngine must be initialized as the
-             * prerequisite.
-             */
-            MapEngine.getInstance().init(new ApplicationContext(m_activity), new OnEngineInitListener() {
-                @Override
-                public void onEngineInitializationCompleted(Error error) {
-                    Toast.makeText(m_activity, "Map Engine initialized with error code:" + error,
-                            Toast.LENGTH_SHORT).show();
-                initMap=true;
-                }
-            });
-        }
+       if(!mapAct) {
+           boolean success = com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(
+                   m_activity.getExternalFilesDir(null) + File.separator + ".here-maps",
+                   "com.here2k19.projects.smartlastmilecommuter.MapService");
+           if (!success) {
+               // Setting the isolated disk cache was not successful, please check if the path is valid and
+               // ensure that it does not match the default location
+               // (getExternalStorageDirectory()/.here-maps).
+               // Also, ensure the provided intent name does not match the default intent name.
+           } else {
+               /*
+                * Even though we don't display a map view in this application, in order to access any
+                * services that HERE Android SDK provides, the MapEngine must be initialized as the
+                * prerequisite.
+                */
+               MapEngine.getInstance().init(new ApplicationContext(m_activity), new OnEngineInitListener() {
+                   @Override
+                   public void onEngineInitializationCompleted(Error error) {
+                       Toast.makeText(m_activity, "Map Engine initialized with error code:" + error,
+                               Toast.LENGTH_SHORT).show();
+                       initMap = true;
+                   }
+               });
+           }
+       }
+       else
+       {
+           boolean success = com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(
+                   mapActivity.getExternalFilesDir(null) + File.separator + ".here-maps",
+                   "com.here2k19.projects.smartlastmilecommuter.MapService");
+           if (!success) {
+               // Setting the isolated disk cache was not successful, please check if the path is valid and
+               // ensure that it does not match the default location
+               // (getExternalStorageDirectory()/.here-maps).
+               // Also, ensure the provided intent name does not match the default intent name.
+           } else {
+               /*
+                * Even though we don't display a map view in this application, in order to access any
+                * services that HERE Android SDK provides, the MapEngine must be initialized as the
+                * prerequisite.
+                */
+               MapEngine.getInstance().init(new ApplicationContext(mapActivity), new OnEngineInitListener() {
+                   @Override
+                   public void onEngineInitializationCompleted(Error error) {
+                       Toast.makeText(mapActivity, "Map Engine initialized with error code:" + error,
+                               Toast.LENGTH_SHORT).show();
+                       initMap = true;
+                   }
+               });
+           }
+
+       }
     }
 
     private void initUIElements() {
@@ -169,13 +231,13 @@ LocationListener locationListenerGPS=new LocationListener() {
 
     }
 
-    private void triggerGeocodeRequest() {
-        m_resultTextView.setText("");
+    public void triggerGeocodeRequest(String city) {
+//        m_resultTextView.setText("");
         /*
          * Create a GeocodeRequest object with the desired query string, then set the search area by
          * providing a GeoCoordinate and radius before executing the request.
          */
-        String query = "4350 Still Creek Dr,Burnaby";
+        String query = city;
         GeocodeRequest geocodeRequest = new GeocodeRequest(query);
         GeoCoordinate coordinate = new GeoCoordinate(49.266787, -123.056640);
         geocodeRequest.setSearchArea(coordinate, 5000);
@@ -189,10 +251,19 @@ LocationListener locationListenerGPS=new LocationListener() {
                      * supported APIs.
                      */
                     StringBuilder sb = new StringBuilder();
+
                     for (GeocodeResult result : results) {
                         sb.append(result.getLocation().getCoordinate().toString());
+                        try {
+                            latitude=""+result.getLocation().getCoordinate().getLatitude();
+                        longitude=""+result.getLocation().getCoordinate().getLongitude();
+                       latlangvalue=true;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                         sb.append("\n");
                     }
+                    //Log.e("geoo",sb.g);
       //              updateTextView(sb.toString());
 
                 } else {
@@ -216,8 +287,12 @@ LocationListener locationListenerGPS=new LocationListener() {
                      * Please refer to HERE Android SDK doc for other supported APIs.
                      */
                 //    updateTextView(location.getAddress().getCity().toString());
-                revvalue=location.getAddress().getCity().toString();
+
+                    revvalue=location.getAddress().getCity().toString();
+                Log.e("reverse",revvalue);
+                       if(mapAct!=true) {
                     progressDialog.dismiss();
+                }
                 } else {
   //                  updateTextView("ERROR:RevGeocode Request returned error code:" + errorCode);
                 }
