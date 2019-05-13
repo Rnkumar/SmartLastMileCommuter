@@ -1,4 +1,4 @@
-package com.here2k19.projects.smartlastmilecommuter.activities.Delivery;
+package com.here2k19.projects.smartlastmilecommuter.Delivery;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -6,7 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.here2k19.projects.smartlastmilecommuter.R;
-import com.here2k19.projects.smartlastmilecommuter.activities.Notification.Notification;
+import com.here2k19.projects.smartlastmilecommuter.Notification.Notification;
 
 import java.util.ArrayList;
 import java.util.List;

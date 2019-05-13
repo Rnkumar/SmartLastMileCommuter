@@ -1,4 +1,4 @@
-package com.here2k19.projects.smartlastmilecommuter.activities.BasicActivity;
+package com.here2k19.projects.smartlastmilecommuter.activities;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -13,16 +13,11 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Layout;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -33,7 +28,6 @@ import com.here.android.mpa.mapping.Map;
 import com.here.android.mpa.mapping.MapGesture;
 import com.here.android.mpa.mapping.MapMarker;
 import com.here.android.mpa.mapping.MapObject;
-import com.here.android.mpa.mapping.MapOverlay;
 import com.here.android.mpa.mapping.MapRoute;
 import com.here.android.mpa.mapping.SupportMapFragment;
 import com.here.android.mpa.routing.CoreRouter;
@@ -44,8 +38,7 @@ import com.here.android.mpa.routing.RouteWaypoint;
 import com.here.android.mpa.routing.Router;
 import com.here.android.mpa.routing.RoutingError;
 import com.here2k19.projects.smartlastmilecommuter.R;
-import com.here2k19.projects.smartlastmilecommuter.activities.Geocoding.MainView;
-import com.here2k19.projects.smartlastmilecommuter.activities.Routing.Waypoints;
+import com.here2k19.projects.smartlastmilecommuter.Geocoding.MainView;
 
 import java.io.File;
 import java.util.ArrayList;

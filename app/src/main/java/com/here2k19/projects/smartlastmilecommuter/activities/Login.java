@@ -1,4 +1,4 @@
-package com.here2k19.projects.smartlastmilecommuter.activities.BasicActivity;
+package com.here2k19.projects.smartlastmilecommuter.activities;
 
 import android.Manifest;
 import android.content.Intent;

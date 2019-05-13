@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.BasicActivity.MapActivity">
+    tools:context=".activities.MapActivity">
 
     <TextView
         android:id="@+id/title"
@@ -19,7 +19,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:context=".activities.BasicActivity.MainActivity" />
+        tools:context=".activities.MainActivity" />
 
 
     <!-- Map Fragment embedded with the map object -->

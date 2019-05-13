@@ -1,9 +1,9 @@
-package com.here2k19.projects.smartlastmilecommuter.activities.BasicActivity;
+package com.here2k19.projects.smartlastmilecommuter.activities;
 
 import com.here.android.mpa.mapping.SupportMapFragment;
 import com.here2k19.projects.smartlastmilecommuter.R;
-import com.here2k19.projects.smartlastmilecommuter.activities.Delivery.GetDeliveries;
-import com.here2k19.projects.smartlastmilecommuter.activities.Geocoding.MainView;
+import com.here2k19.projects.smartlastmilecommuter.Delivery.GetDeliveries;
+import com.here2k19.projects.smartlastmilecommuter.Geocoding.MainView;
 
 import android.content.Context;
 import android.content.Intent;

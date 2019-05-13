@@ -1,19 +1,10 @@
-package com.here2k19.projects.smartlastmilecommuter.activities.Geocoding;
+package com.here2k19.projects.smartlastmilecommuter.Geocoding;
 
 import java.io.File;
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.here.android.mpa.common.ApplicationContext;
 import com.here.android.mpa.common.GeoCoordinate;
-import com.here.android.mpa.common.GeoPosition;
 import com.here.android.mpa.common.MapEngine;
 import com.here.android.mpa.common.OnEngineInitListener;
 import com.here.android.mpa.common.PositioningManager;
@@ -23,8 +14,7 @@ import com.here.android.mpa.search.GeocodeResult;
 import com.here.android.mpa.search.Location;
 import com.here.android.mpa.search.ResultListener;
 import com.here.android.mpa.search.ReverseGeocodeRequest;
-import com.here2k19.projects.smartlastmilecommuter.R;
-import com.here2k19.projects.smartlastmilecommuter.activities.BasicActivity.MapActivity;
+import com.here2k19.projects.smartlastmilecommuter.activities.MapActivity;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -34,17 +24,11 @@ import android.location.LocationManager;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import org.json.JSONObject;
 
 /**
  * This class demonstrates the usage of Geocoding and Reverse Geocoding request APIs

@@ -1,4 +1,4 @@
-package com.here2k19.projects.smartlastmilecommuter.activities.Delivery;
+package com.here2k19.projects.smartlastmilecommuter.Delivery;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.here2k19.projects.smartlastmilecommuter.R;
-import com.here2k19.projects.smartlastmilecommuter.activities.BasicActivity.MapActivity;
+import com.here2k19.projects.smartlastmilecommuter.activities.MapActivity;
 
 import java.util.List;
 

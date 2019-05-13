@@ -1,4 +1,4 @@
-package com.here2k19.projects.smartlastmilecommuter.activities.Routing;
+package com.here2k19.projects.smartlastmilecommuter.Routing;
 import android.content.Context;
 import android.util.Log;
 import com.android.volley.Request;
@@ -13,7 +13,7 @@ import com.here2k19.projects.smartlastmilecommuter.R;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
+
 public class Waypoints {
 //Waypoints waypoints=this;
   private static String response1="df";

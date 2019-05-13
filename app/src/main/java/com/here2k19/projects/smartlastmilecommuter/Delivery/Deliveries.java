@@ -1,4 +1,4 @@
-package com.here2k19.projects.smartlastmilecommuter.activities.Delivery;
+package com.here2k19.projects.smartlastmilecommuter.Delivery;
 
 public class Deliveries {
     private String item;

@@ -1,4 +1,4 @@
-package com.here2k19.projects.smartlastmilecommuter.activities.Notification;
+package com.here2k19.projects.smartlastmilecommuter.Notification;
 
 import android.content.Context;
 import android.os.Build;

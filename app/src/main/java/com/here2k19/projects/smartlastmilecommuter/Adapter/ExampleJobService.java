@@ -1,4 +1,4 @@
-package com.here2k19.projects.smartlastmilecommuter.activities.Adapter;
+package com.here2k19.projects.smartlastmilecommuter.Adapter;
 
 import android.app.job.JobParameters;
 import android.app.job.JobService;

@@ -1,4 +1,4 @@
-package com.here2k19.projects.smartlastmilecommuter.activities.Notification;
+package com.here2k19.projects.smartlastmilecommuter.Notification;
 
 import android.annotation.TargetApi;
 import android.app.Notification;
@@ -8,7 +8,6 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Color;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
 
 import com.here2k19.projects.smartlastmilecommuter.R;
 
