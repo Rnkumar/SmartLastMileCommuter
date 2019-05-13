@@ -10,9 +10,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.Toast;
-
 import com.here2k19.projects.smartlastmilecommuter.R;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,13 +21,11 @@ public class Login extends AppCompatActivity {
     private static final String[] REQUIRED_SDK_PERMISSIONS = new String[] {
             Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE };
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-  checkPermissions();
+        checkPermissions();
         Handler handler=new Handler();
         handler.postDelayed(new Runnable() {
             @Override

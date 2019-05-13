@@ -273,7 +273,7 @@ mapAct=true;
         });
     }
 
-    private void triggerRevGeocodeRequest(double lat,double lang) {
+    public void triggerRevGeocodeRequest(double lat,double lang) {
      //   m_resultTextView.setText("");
         /* Create a ReverseGeocodeRequest object with a GeoCoordinate. */
         GeoCoordinate coordinate = new GeoCoordinate(lat, lang);
@@ -288,9 +288,16 @@ mapAct=true;
                      */
                 //    updateTextView(location.getAddress().getCity().toString());
 
-                    revvalue=location.getAddress().getCity().toString();
-                Log.e("reverse",revvalue);
-                       if(mapAct!=true) {
+                    revvalue=location.getAddress().getDistrict();
+              //  Log.e("reverse",revvalue);
+              //  Log.e("city",location.getAddress().getCity());
+               // Log.e("country",location.getAddress().getCounty());
+                //Log.e("Street",location.getAddress().getStreet());
+                //Log.e("suitenumber",location.getAddress().getSuiteNumberOrName());
+                //Log.e("Floor",location.getAddress().getFloorNumber());
+                Log.e("district",location.getAddress().getDistrict());
+                //Log.e("address",location.getAddress().getText());
+                if(mapAct!=true) {
                     progressDialog.dismiss();
                 }
                 } else {

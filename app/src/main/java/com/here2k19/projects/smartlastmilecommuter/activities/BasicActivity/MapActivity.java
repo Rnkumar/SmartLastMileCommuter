@@ -1,23 +1,36 @@
 package com.here2k19.projects.smartlastmilecommuter.activities.BasicActivity;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.PointF;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Layout;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.OnEngineInitListener;
+import com.here.android.mpa.common.ViewObject;
 import com.here.android.mpa.mapping.Map;
+import com.here.android.mpa.mapping.MapGesture;
 import com.here.android.mpa.mapping.MapMarker;
 import com.here.android.mpa.mapping.MapObject;
 import com.here.android.mpa.mapping.MapOverlay;
@@ -62,11 +75,22 @@ int count=0;
 GeoCoordinate currentloc,adminloc;
 double currentloclat,currentloclang;
 Button orders;
+public static double nearbyvalue;
+ArrayList<GeoCoordinate> nearbycentres;
+ArrayList<GeoCoordinate> listOfValues;
     ArrayList<GeoCoordinate> orderlocation;
+    private MapMarker ordersMarker;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         checkPermissions();
+        nearbycentres=new ArrayList<GeoCoordinate>();
+      listOfValues=new ArrayList<GeoCoordinate>();
+        nearbycentres.add(new GeoCoordinate(12.9716,80.0434));
+        nearbycentres.add(new GeoCoordinate(13.0500,80.2121));
+        nearbycentres.add(new GeoCoordinate(13.0382,80.1565));
         orders=findViewById(R.id.orders);
         orders.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -151,8 +175,100 @@ drawRouteForOrder(orderlocation);
                         // Set the map center to the Vancouver region (no animation)
                         // Set the zoom level to the average between min and max
                         map.setZoomLevel(15);
-           //             drawRoute();
-                        //coreRouter.calculateRoute(routePlan,new Rou);
+                        if(mapFragment!=null)
+                        {
+                            mapFragment.getMapGesture().addOnGestureListener(new MapGesture.OnGestureListener() {
+                                @Override
+                                public void onPanStart() {
+
+                                }
+
+                                @Override
+                                public void onPanEnd() {
+
+                                }
+
+                                @Override
+                                public void onMultiFingerManipulationStart() {
+
+                                }
+
+                                @Override
+                                public void onMultiFingerManipulationEnd() {
+
+                                }
+
+                                @Override
+                                public boolean onMapObjectsSelected(List<ViewObject> list) {
+                                    for (ViewObject viewObject : list) {
+                                        if (viewObject.getBaseType() == ViewObject.Type.USER_OBJECT) {
+                                            MapObject mapObject = (MapObject) viewObject;
+
+                                            if (mapObject.getType() == MapObject.Type.MARKER) {
+
+                                                MapMarker window_marker = ((MapMarker) mapObject);
+
+                                            //    System.out.println("Title is................."+window_marker.getTitle());
+                                                Log.e("Totle",""+window_marker.getCoordinate());
+                                                popup(window_marker.getCoordinate());
+                                                return true;
+                                            }
+                                        }
+                                    }
+                                    return false;
+                                }
+
+                                @Override
+                                public boolean onTapEvent(PointF pointF) {
+                                    return false;
+                                }
+
+                                @Override
+                                public boolean onDoubleTapEvent(PointF pointF) {
+                                    return false;
+                                }
+
+                                @Override
+                                public void onPinchLocked() {
+
+                                }
+
+                                @Override
+                                public boolean onPinchZoomEvent(float v, PointF pointF) {
+                                    return false;
+                                }
+
+                                @Override
+                                public void onRotateLocked() {
+
+                                }
+
+                                @Override
+                                public boolean onRotateEvent(float v) {
+                                    return false;
+                                }
+
+                                @Override
+                                public boolean onTiltEvent(float v) {
+                                    return false;
+                                }
+
+                                @Override
+                                public boolean onLongPressEvent(PointF pointF) {
+                                    return false;
+                                }
+
+                                @Override
+                                public void onLongPressRelease() {
+
+                                }
+
+                                @Override
+                                public boolean onTwoFingerTapEvent(PointF pointF) {
+                                    return false;
+                                }
+                            },0,false);
+                        }
 
                     } else {
                         System.out.println("ERROR: Cannot initialize Map Fragment");
@@ -161,6 +277,80 @@ drawRouteForOrder(orderlocation);
             });
         }
     }
+public void nearby(GeoCoordinate first,ArrayList<GeoCoordinate> list)
+{
+    Location location1,location2;
+    location1=new Location("value1");
+    location2=new Location("value2");
+   location1.setLatitude(first.getLatitude());
+   location1.setLongitude(first.getLongitude());
+   GeoCoordinate geoCoordinate;
+    for(int i=0;i<list.size();i++)
+    {
+        location2.setLatitude(list.get(i).getLatitude());
+        location2.setLatitude(list.get(i).getLongitude());
+        if(nearbyvalue==0)
+        {
+            nearbyvalue=location1.distanceTo(location2);
+        }
+        else
+        {
+            if(nearbyvalue<location1.distanceTo(location2))
+            {
+                nearbyvalue=location1.distanceTo(location2);
+            geoCoordinate=new GeoCoordinate(location2.getLatitude(),location2.getLongitude());
+                listOfValues.add(geoCoordinate);
+            Log.e("nearbyvalue",""+nearbyvalue);
+
+            }
+        }
+    }
+}
+    private void popup(GeoCoordinate title) {
+        LayoutInflater li = LayoutInflater.from(MapActivity.this);
+        View promptsView = li.inflate(R.layout.custom, null);
+nearby(title,nearbycentres);
+for(int i=0;i<listOfValues.size();i++)
+{
+    Log.e("size",""+listOfValues.size());
+ Log.e("valueslist",listOfValues.get(i).toString());
+}
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                MapActivity.this);
+
+         alertDialogBuilder.setView(promptsView);
+        // set prompts.xml to alertdialog builder
+
+        final EditText userInput = (EditText) promptsView
+                .findViewById(R.id.editTextDialogUserInput);
+
+        // set dialog message
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                // get user input and set it to result
+                                // edit text
+                               // result.setText(userInput.getText());
+                            }
+                        })
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+                                dialog.cancel();
+                            }
+                        });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
+
+    }
+
+
 
     private void drawRoute(GeoCoordinate adminloc, GeoCoordinate currentloc) {
         coreRouter=new CoreRouter();
@@ -200,10 +390,20 @@ private void drawRouteForOrder(ArrayList<GeoCoordinate> arrayList)
     }
     coreRouter=new CoreRouter();
     RoutePlan routePlan=new RoutePlan();
+    MainView mainView=new MainView(this);
+    double lat,lang;
 for(int i=0;i<arrayList.size();i++)
 {
     routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(arrayList.get(i))));
+    lat=arrayList.get(i).getLatitude();
+    lang=arrayList.get(i).getLongitude();
+    mainView.triggerRevGeocodeRequest(lat,lang);
+    ordersMarker=new MapMarker(new GeoCoordinate(arrayList.get(i))).setTitle(""+i);
+//    Log.e("MapActRev",MainView.revvalue);
+    map.addMapObject(ordersMarker);
 }
+
+
     RouteOptions routeOptions = new RouteOptions();
     routeOptions.setTransportMode(RouteOptions.TransportMode.CAR);
     routeOptions.setRouteType(RouteOptions.Type.FASTEST);

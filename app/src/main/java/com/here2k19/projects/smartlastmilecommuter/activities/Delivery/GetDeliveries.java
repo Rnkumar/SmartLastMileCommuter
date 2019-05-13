@@ -24,8 +24,6 @@ public class GetDeliveries extends AppCompatActivity  {
         String value=getIntent().getExtras().getString("reversed_value");
     if(value!=null)
     {
-        if(value.equals("Sriperumbudur"))
-        {
             recyclerView=findViewById(R.id.recyclerView);
             recyclerView.setHasFixedSize(true);
             recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -38,10 +36,7 @@ public class GetDeliveries extends AppCompatActivity  {
             productList.add(new Deliveries("orange","150","tambaram"));
             DeliveriesAdapter adapter=new DeliveriesAdapter(this,productList);
             recyclerView.setAdapter(adapter);
-        }
 
-        //Log.e("value",value);
     }
-
     }
 }
