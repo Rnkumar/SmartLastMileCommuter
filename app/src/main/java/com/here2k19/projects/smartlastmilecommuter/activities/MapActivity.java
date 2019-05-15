@@ -3,11 +3,15 @@ package com.here2k19.projects.smartlastmilecommuter.activities;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.graphics.PointF;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
@@ -18,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 
@@ -37,8 +42,11 @@ import com.here.android.mpa.routing.RouteResult;
 import com.here.android.mpa.routing.RouteWaypoint;
 import com.here.android.mpa.routing.Router;
 import com.here.android.mpa.routing.RoutingError;
+import com.here2k19.projects.smartlastmilecommuter.Adapter.MapFragmentView;
 import com.here2k19.projects.smartlastmilecommuter.R;
 import com.here2k19.projects.smartlastmilecommuter.Geocoding.MainView;
+import com.here2k19.projects.smartlastmilecommuter.Routing.Positioning;
+import com.here2k19.projects.smartlastmilecommuter.Routing.Waypoints;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -54,10 +62,12 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
     /**
      * Permissions that need to be explicitly requested from end user.
      */
+    boolean getalert=false;
     private static final String[] REQUIRED_SDK_PERMISSIONS = new String[] {
             Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE };
-
+    boolean value,value1=false;
     // map embedded in the map fragment
+    public static String vehicle="bike";
     private Map map = null;
 MapRoute adminlocroute;
     // map fragment embedded in this activity
@@ -73,14 +83,22 @@ ArrayList<GeoCoordinate> nearbycentres;
 ArrayList<GeoCoordinate> listOfValues;
     ArrayList<GeoCoordinate> orderlocation;
     private MapMarker ordersMarker;
+    private MapFragmentView m_mapFragmentView;
 
+    @Override
+    public void onDestroy() {
+        m_mapFragmentView.onDestroy();
+        super.onDestroy();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         checkPermissions();
+setupMapFragmentView();
+       // getAlert();
         nearbycentres=new ArrayList<GeoCoordinate>();
-      listOfValues=new ArrayList<GeoCoordinate>();
+        listOfValues=new ArrayList<GeoCoordinate>();
         nearbycentres.add(new GeoCoordinate(12.9716,80.0434));
         nearbycentres.add(new GeoCoordinate(13.0500,80.2121));
         nearbycentres.add(new GeoCoordinate(13.0382,80.1565));
@@ -88,8 +106,13 @@ ArrayList<GeoCoordinate> listOfValues;
         orders.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 getOrders();
+                if(orderlocation!=null)
+                {
+                    Waypoints waypoints=new Waypoints(MapActivity.this);
+                    waypoints.getWaypoints(orderlocation,MapActivity.this);
+                }
+
             }
         });
         appCompatActivity=new AppCompatActivity();
@@ -97,7 +120,10 @@ ArrayList<GeoCoordinate> listOfValues;
         if(admin_loc!=null)
         {
             MainView mainView=new MainView(MapActivity.this);
-        mainView.triggerGeocodeRequest(admin_loc);
+
+            if(MainView.initMap) {
+            mainView.triggerGeocodeRequest(admin_loc);
+        }
             Handler handler=new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
@@ -108,17 +134,27 @@ ArrayList<GeoCoordinate> listOfValues;
                 adminlat = Double.parseDouble(MainView.latitude);
                 adminlang = Double.parseDouble(MainView.longitude);
                 adminloc=new GeoCoordinate(adminlat,adminlang);
-            currentloclat= Double.parseDouble(MainView.currentloclat);
-            currentloclang= Double.parseDouble(MainView.currentloclang);
+            currentloclat= Double.parseDouble(String.valueOf(Positioning.latitude));
+            currentloclang= Double.parseDouble(String.valueOf(Positioning.longitude));
             if(map!=null)
             {
-               ArrayList<MapObject> markers=new ArrayList<MapObject>();
-               markers.add(new MapMarker(new GeoCoordinate(currentloclat,currentloclang)).setTitle("ahii").setDescription("dfdf"));
-               markers.add(new MapMarker(new GeoCoordinate(adminlat,adminlang)).setTitle(admin_loc));
-               map.addMapObjects(markers);
+                getAlert();
+               Handler handler1=new Handler();
+               handler1.postDelayed(new Runnable() {
+                   @Override
+                   public void run() {
+                       if(getalert) {
+                           ArrayList<MapObject> markers = new ArrayList<MapObject>();
+                           markers.add(new MapMarker(new GeoCoordinate(currentloclat, currentloclang)).setTitle("ahii").setDescription("dfdf"));
+                           markers.add(new MapMarker(new GeoCoordinate(adminlat, adminlang)).setTitle(admin_loc));
+                           map.addMapObjects(markers);
 
-                map.setCenter(new GeoCoordinate(currentloclat, currentloclang, 0.0),
-                    Map.Animation.NONE);
+                           map.setCenter(new GeoCoordinate(currentloclat, currentloclang, 0.0),
+                                   Map.Animation.NONE);
+                       }
+                   }
+               },5000);
+
 
             }
                 currentloc=new GeoCoordinate(currentloclat,currentloclang);
@@ -130,6 +166,64 @@ ArrayList<GeoCoordinate> listOfValues;
             },2000);
 
         }
+    }
+
+    private void getAlert() {
+        LayoutInflater li = LayoutInflater.from(MapActivity.this);
+        View promptsView = li.inflate(R.layout.custom, null);
+
+        final ImageButton bike=promptsView.findViewById(R.id.bike);
+        final ImageButton car=promptsView.findViewById(R.id.car);
+        bike.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onClick(View v) {
+              value=true;
+              value1=false;
+             bike.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#cf1020")));
+                car.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#537CFF")));
+            }
+        });
+        car.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public void onClick(View v) {
+                value=false;
+                value1=true;
+                bike.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#537CFF")));
+                car.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#cf1020")));
+            }
+        });
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+                MapActivity.this);
+
+        alertDialogBuilder.setView(promptsView);
+        alertDialogBuilder
+                .setCancelable(false)
+                .setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog,int id) {
+             if(value==true)
+             {
+                 vehicle="bike";
+getalert=true;
+             }
+             else
+             {
+                 vehicle="car";
+             getalert=true;
+             }
+             Log.e("vehicle",vehicle);
+                            }
+                        });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        alertDialog.show();
+
     }
 
     private void getOrders() {
@@ -145,12 +239,17 @@ drawRouteForOrder(orderlocation);
     Log.e("cll","called");
         return (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapfragment);
     }
-
+    private void setupMapFragmentView() {
+        // All permission requests are being handled. Create map fragment view. Please note
+        // the HERE SDK requires all permissions defined above to operate properly.
+        m_mapFragmentView = new MapFragmentView(MapActivity.this);
+    }
     private void initialize() {
         setContentView(R.layout.activity_map);
 
         // Search for the map fragment to finish setup by calling init().
         mapFragment = getMapFragment();
+
         // Set up disk cache path for the map service for this application
         boolean success = com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(
                 getApplicationContext().getExternalFilesDir(null) + File.separator + ".here-maps",
@@ -168,6 +267,7 @@ drawRouteForOrder(orderlocation);
                         // Set the map center to the Vancouver region (no animation)
                         // Set the zoom level to the average between min and max
                         map.setZoomLevel(15);
+
                         if(mapFragment!=null)
                         {
                             mapFragment.getMapGesture().addOnGestureListener(new MapGesture.OnGestureListener() {
@@ -203,7 +303,7 @@ drawRouteForOrder(orderlocation);
 
                                             //    System.out.println("Title is................."+window_marker.getTitle());
                                                 Log.e("Totle",""+window_marker.getCoordinate());
-                                                popup(window_marker.getCoordinate());
+  //                                              popup(window_marker.getCoordinate());
                                                 return true;
                                             }
                                         }
@@ -270,7 +370,7 @@ drawRouteForOrder(orderlocation);
             });
         }
     }
-public void nearby(GeoCoordinate first,ArrayList<GeoCoordinate> list)
+/*public void nearby(GeoCoordinate first,ArrayList<GeoCoordinate> list)
 {
     Location location1,location2;
     location1=new Location("value1");
@@ -298,8 +398,8 @@ public void nearby(GeoCoordinate first,ArrayList<GeoCoordinate> list)
             }
         }
     }
-}
-    private void popup(GeoCoordinate title) {
+}*/
+    /*private void popup(GeoCoordinate title) {
         LayoutInflater li = LayoutInflater.from(MapActivity.this);
         View promptsView = li.inflate(R.layout.custom, null);
 nearby(title,nearbycentres);
@@ -342,7 +442,7 @@ for(int i=0;i<listOfValues.size();i++)
         alertDialog.show();
 
     }
-
+*/
 
 
     private void drawRoute(GeoCoordinate adminloc, GeoCoordinate currentloc) {
@@ -351,9 +451,17 @@ for(int i=0;i<listOfValues.size();i++)
         routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(adminloc)));
         routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(currentloc)));
         RouteOptions routeOptions = new RouteOptions();
-        routeOptions.setTransportMode(RouteOptions.TransportMode.CAR);
-        routeOptions.setRouteType(RouteOptions.Type.FASTEST);
-        routePlan.setRouteOptions(routeOptions);
+        if(vehicle.equals("bike")) {
+            routeOptions.setTransportMode(RouteOptions.TransportMode.SCOOTER);
+            routeOptions.setRouteType(RouteOptions.Type.FASTEST);
+            routePlan.setRouteOptions(routeOptions);
+        }
+        else
+        {
+            routeOptions.setTransportMode(RouteOptions.TransportMode.CAR);
+            routeOptions.setRouteType(RouteOptions.Type.FASTEST);
+            routePlan.setRouteOptions(routeOptions);
+        }
         coreRouter.calculateRoute(routePlan, new Router.Listener<List<RouteResult>, RoutingError>() {
             @Override
             public void onProgress(int i) {
@@ -398,9 +506,17 @@ for(int i=0;i<arrayList.size();i++)
 
 
     RouteOptions routeOptions = new RouteOptions();
-    routeOptions.setTransportMode(RouteOptions.TransportMode.CAR);
-    routeOptions.setRouteType(RouteOptions.Type.FASTEST);
-    routePlan.setRouteOptions(routeOptions);
+    if(vehicle.equals("bike")) {
+        routeOptions.setTransportMode(RouteOptions.TransportMode.SCOOTER);
+        routeOptions.setRouteType(RouteOptions.Type.FASTEST);
+        routePlan.setRouteOptions(routeOptions);
+    }
+    else
+    {
+        routeOptions.setTransportMode(RouteOptions.TransportMode.CAR);
+        routeOptions.setRouteType(RouteOptions.Type.FASTEST);
+        routePlan.setRouteOptions(routeOptions);
+    }
     coreRouter.calculateRoute(routePlan, new Router.Listener<List<RouteResult>, RoutingError>() {
         @Override
         public void onProgress(int i) {
@@ -461,7 +577,11 @@ for(int i=0;i<arrayList.size();i++)
                     }
                 }
                 // all permissions were granted
-                initialize();
+
+           //     if(getalert) {
+                    initialize();
+             //      }
+
                 break;
         }
     }

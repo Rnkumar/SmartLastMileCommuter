@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.here2k19.projects.smartlastmilecommuter.Delivery.GetDeliveries;
 import com.here2k19.projects.smartlastmilecommuter.R;
 import com.mukesh.OnOtpCompletionListener;
 import com.mukesh.OtpView;
@@ -54,7 +55,7 @@ public class LoginActivity extends AppCompatActivity{
         super.onStart();
         if (FirebaseAuth.getInstance().getCurrentUser() != null){
             finish();
-            startActivity(new Intent(this,BusinessType.class));
+            startActivity(new Intent(this,GetDeliveries.class));
         }
     }
 
@@ -92,6 +93,7 @@ public class LoginActivity extends AppCompatActivity{
                                     Toast.makeText(LoginActivity.this, "Firebase Quota Reached", Toast.LENGTH_SHORT).show();
                                 }else{
                                     Toast.makeText(LoginActivity.this, ""+e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Log.e("err",e.getMessage());
                                 }
                             }
                         });
@@ -116,7 +118,7 @@ public class LoginActivity extends AppCompatActivity{
                             Log.e(TAG, "signInWithCredential:success");
                             FirebaseUser user = task.getResult().getUser();
                             finish();
-                            startActivity(new Intent(getApplicationContext(), BusinessType.class));
+                            startActivity(new Intent(getApplicationContext(), GetDeliveries.class));
                         } else {
                             progressDialog.dismiss();
                             Log.e(TAG, "signInWithCredential:failure", task.getException());

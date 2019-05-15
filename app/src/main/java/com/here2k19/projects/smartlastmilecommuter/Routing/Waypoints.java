@@ -55,7 +55,7 @@ public class Waypoints {
                 "?start=+"+latLngList.get(0)+"\n" +
                 "&destination1="+latLngList.get(1)+"\n" +
                 "&destination2="+latLngList.get(2)+"\n" +
-                "&end="+latLngList.get(3)+"\n" +
+                "&end="+latLngList.get(((latLngList.size())-1))+"\n" +
                 "&mode=fastest;car\n" +
                 "&app_id="+app_id +
                 "&app_code="+app_code;
@@ -69,7 +69,7 @@ public class Waypoints {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e("err",error.getMessage());
+                Log.e("err",""+error);
             }
         });
         requestQueue.add(jsonArrayRequest);

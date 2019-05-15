@@ -29,7 +29,6 @@ public class BusinessType extends AppCompatActivity {
         setContentView(R.layout.activity_business_type);
 //        initEngine();
         //SupportMapFragment supportMapFragment=findViewById(R.id.mapfragment);
-
         mContext = this;
 MainView mainView=new MainView(this);
         b2b = findViewById(R.id.b2b);
