@@ -39,7 +39,7 @@ public class MainView {
     MapActivity mapActivity;
     private TextView m_resultTextView;
     LocationManager locationManager;
-    boolean initMap = false;
+    public static boolean initMap = false;
     PositioningManager posManager;
     public static String revvalue="";
    public static String currentloclat,currentloclang=null;
@@ -59,56 +59,9 @@ ProgressDialog progressDialog=null;
         initMapEngine();
         initUIElements();
         //triggerRevGeocodeRequest(lat,lang);
-        Handler handler=new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-                if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-                }
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                        2000,
-                        10, locationListenerGPS);
-            }
-        },2000);
 
     //getCurrentLocation();
     }
-LocationListener locationListenerGPS=new LocationListener() {
-    @Override
-    public void onLocationChanged(android.location.Location location) {
-      if(count==0) {
-          Log.e("location", "" + location.getLatitude());
-       if(!initMap)
-       {
-           count=0;
-       }
-          if(initMap) {
-   MainView.currentloclat=""+location.getLatitude();
-MainView.currentloclang=""+location.getLongitude();
-Log.e("currentlat",currentloclat);
-triggerRevGeocodeRequest(location.getLatitude(), location.getLongitude());
-           count++;
-       }
-       }
-      }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
-};
 
     public MainView(final MapActivity activity) {
 
@@ -117,20 +70,6 @@ mapAct=true;
         initMapEngine();
         initUIElements();
         //triggerRevGeocodeRequest(lat,lang);
-        Handler handler=new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-                if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-                }
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER,
-                        2000,
-                        10, locationListenerGPS);
-            }
-        },2000);
-
     }
 
     private void getCurrentLocation() {
@@ -160,6 +99,7 @@ mapAct=true;
                        Toast.makeText(m_activity, "Map Engine initialized with error code:" + error,
                                Toast.LENGTH_SHORT).show();
                        initMap = true;
+progressDialog.dismiss();
                    }
                });
            }
@@ -186,6 +126,7 @@ mapAct=true;
                        Toast.makeText(mapActivity, "Map Engine initialized with error code:" + error,
                                Toast.LENGTH_SHORT).show();
                        initMap = true;
+                     //  progressDialog.dismiss();
                    }
                });
            }
@@ -260,32 +201,26 @@ mapAct=true;
     public void triggerRevGeocodeRequest(double lat,double lang) {
      //   m_resultTextView.setText("");
         /* Create a ReverseGeocodeRequest object with a GeoCoordinate. */
+        Log.e("call","called");
         GeoCoordinate coordinate = new GeoCoordinate(lat, lang);
         ReverseGeocodeRequest revGecodeRequest = new ReverseGeocodeRequest(coordinate);
         revGecodeRequest.execute(new ResultListener<Location>() {
             @Override
             public void onCompleted(Location location, ErrorCode errorCode) {
                 if (errorCode == ErrorCode.NONE) {
-                    /*
-                     * From the location object, we retrieve the address and display to the screen.
-                     * Please refer to HERE Android SDK doc for other supported APIs.
-                     */
-                //    updateTextView(location.getAddress().getCity().toString());
+//if(revvalue!=null)
 
-                    revvalue=location.getAddress().getDistrict();
-              //  Log.e("reverse",revvalue);
-              //  Log.e("city",location.getAddress().getCity());
-               // Log.e("country",location.getAddress().getCounty());
-                //Log.e("Street",location.getAddress().getStreet());
-                //Log.e("suitenumber",location.getAddress().getSuiteNumberOrName());
-                //Log.e("Floor",location.getAddress().getFloorNumber());
+                    //revvalue=location.getAddress().getDistrict();
+revvalue=location.getAddress().getText();
                 Log.e("district",location.getAddress().getDistrict());
-                //Log.e("address",location.getAddress().getText());
-                if(mapAct!=true) {
-                    progressDialog.dismiss();
-                }
+                Log.e("address",location.getAddress().getText());
+                //if(mapAct!=true) {
+
+                    //}
+                    //}
                 } else {
   //                  updateTextView("ERROR:RevGeocode Request returned error code:" + errorCode);
+               Log.e("erreor",""+errorCode);
                 }
             }
         });
