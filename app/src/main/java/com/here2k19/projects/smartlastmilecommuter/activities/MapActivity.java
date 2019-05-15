@@ -45,6 +45,7 @@ import com.here.android.mpa.routing.RoutingError;
 import com.here2k19.projects.smartlastmilecommuter.Adapter.MapFragmentView;
 import com.here2k19.projects.smartlastmilecommuter.R;
 import com.here2k19.projects.smartlastmilecommuter.Geocoding.MainView;
+import com.here2k19.projects.smartlastmilecommuter.Routing.MapFragmentView1;
 import com.here2k19.projects.smartlastmilecommuter.Routing.Positioning;
 import com.here2k19.projects.smartlastmilecommuter.Routing.Waypoints;
 
@@ -75,7 +76,7 @@ MapRoute adminlocroute;
 CoreRouter coreRouter;
 double adminlat,adminlang;
 int count=0;
-GeoCoordinate currentloc,adminloc;
+public static GeoCoordinate currentloc,adminloc;
 double currentloclat,currentloclang;
 Button orders;
 public static double nearbyvalue;
@@ -84,7 +85,7 @@ ArrayList<GeoCoordinate> listOfValues;
     ArrayList<GeoCoordinate> orderlocation;
     private MapMarker ordersMarker;
     private MapFragmentView m_mapFragmentView;
-
+Button bt;
     @Override
     public void onDestroy() {
         m_mapFragmentView.onDestroy();
@@ -246,8 +247,15 @@ drawRouteForOrder(orderlocation);
     }
     private void initialize() {
         setContentView(R.layout.activity_map);
-
+bt=findViewById(R.id.navigation);
+bt.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        MapFragmentView1 mapFragmentView1=new MapFragmentView1(MapActivity.this);
+    }
+});
         // Search for the map fragment to finish setup by calling init().
+
         mapFragment = getMapFragment();
 
         // Set up disk cache path for the map service for this application
