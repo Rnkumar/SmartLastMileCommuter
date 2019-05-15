@@ -103,7 +103,8 @@ public class MapFragmentView1 {
                                                                          RoutingError routingError) {
                                         if (routingError == RoutingError.NONE) {
                                             Route route = list.get(0).getRoute();
-
+                                            int duration=route.getTtaExcludingTraffic(Route.WHOLE_ROUTE).getDuration();
+Log.e("duration", String.valueOf(duration));
                                             // move the map to the first waypoint which is starting point of
                                             // the route
                                             m_map.setCenter(routePlan.getWaypoint(0).getNavigablePosition(),

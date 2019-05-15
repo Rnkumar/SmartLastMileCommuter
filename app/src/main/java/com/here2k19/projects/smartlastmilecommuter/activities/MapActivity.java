@@ -36,6 +36,7 @@ import com.here.android.mpa.mapping.MapObject;
 import com.here.android.mpa.mapping.MapRoute;
 import com.here.android.mpa.mapping.SupportMapFragment;
 import com.here.android.mpa.routing.CoreRouter;
+import com.here.android.mpa.routing.Route;
 import com.here.android.mpa.routing.RouteOptions;
 import com.here.android.mpa.routing.RoutePlan;
 import com.here.android.mpa.routing.RouteResult;
@@ -86,6 +87,7 @@ ArrayList<GeoCoordinate> listOfValues;
     private MapMarker ordersMarker;
     private MapFragmentView m_mapFragmentView;
 Button bt;
+Button time;
     @Override
     public void onDestroy() {
         m_mapFragmentView.onDestroy();
@@ -248,6 +250,7 @@ drawRouteForOrder(orderlocation);
     private void initialize() {
         setContentView(R.layout.activity_map);
 bt=findViewById(R.id.navigation);
+time=findViewById(R.id.tim);
 bt.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onClick(View v) {
@@ -463,6 +466,7 @@ for(int i=0;i<listOfValues.size();i++)
             routeOptions.setTransportMode(RouteOptions.TransportMode.SCOOTER);
             routeOptions.setRouteType(RouteOptions.Type.FASTEST);
             routePlan.setRouteOptions(routeOptions);
+
         }
         else
         {
@@ -480,6 +484,14 @@ for(int i=0;i<listOfValues.size();i++)
             public void onCalculateRouteFinished(List<RouteResult> routeResults, RoutingError routingError) {
                 if (routingError == RoutingError.NONE) {
                     // Render the route on the map
+                    int duration=routeResults.get(0).getRoute().getTtaExcludingTraffic(Route.WHOLE_ROUTE).getDuration();
+                    int hours=duration/60;
+                    time.setText(hours+"min");
+                    if(hours<1)
+                    {
+                        time.setText(duration+"min");
+                    }
+
                     adminlocroute = new MapRoute(routeResults.get(0).getRoute());
                     map.addMapObject(adminlocroute);
 
@@ -535,6 +547,13 @@ for(int i=0;i<arrayList.size();i++)
         public void onCalculateRouteFinished(List<RouteResult> routeResults, RoutingError routingError) {
             if (routingError == RoutingError.NONE) {
                 // Render the route on the map
+ int duration=routeResults.get(0).getRoute().getTtaExcludingTraffic(Route.WHOLE_ROUTE).getDuration();
+              int hours=duration/60;
+              time.setText(hours+"min");
+               if(hours<1)
+               {
+                   time.setText(duration+"min");
+               }
                 Ordersroute = new MapRoute(routeResults.get(0).getRoute());
                 map.addMapObject(Ordersroute);
 

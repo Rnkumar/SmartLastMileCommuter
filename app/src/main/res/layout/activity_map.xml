@@ -45,7 +45,13 @@
         android:textColor="#cf1020"
         android:textSize="20dp"
         />
-
+<Button
+    android:id="@+id/tim"
+    android:layout_alignParentRight="true"
+    android:layout_alignParentBottom="true"
+    android:layout_marginBottom="150dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />
     <Button
     android:id="@+id/orders"
     android:layout_alignParentRight="true"
