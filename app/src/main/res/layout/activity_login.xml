@@ -24,14 +24,14 @@
         android:src="@mipmap/ic_launcher_gen_circle" />
 <EditText
     android:hint="Name"
- android:id="@+id/name"
+    android:id="@+id/usrname"
     android:layout_marginTop="40dp"
     android:layout_below="@+id/logo_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content" />
     <android.support.design.widget.TextInputLayout
         android:layout_marginTop="50dp"
-        android:layout_below="@id/name"
+        android:layout_below="@id/usrname"
         android:id="@+id/login_mobile_number_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

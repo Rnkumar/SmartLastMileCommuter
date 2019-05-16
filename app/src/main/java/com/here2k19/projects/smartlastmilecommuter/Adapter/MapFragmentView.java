@@ -315,6 +315,7 @@ MapMarker mapMarker,mapMarker1;
         /* Register a PositionListener to monitor the position updates */
         m_navigationManager.addPositionListener(
                 new WeakReference<NavigationManager.PositionListener>(m_positionListener));
+
     }
 
     private NavigationManager.PositionListener m_positionListener = new NavigationManager.PositionListener() {

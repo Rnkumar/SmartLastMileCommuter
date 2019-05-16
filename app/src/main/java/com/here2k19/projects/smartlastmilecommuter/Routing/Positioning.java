@@ -86,7 +86,7 @@ if(count==0) {
         count++;
     }
     }
-Log.e("lat",""+geoPosition.getCoordinate().getLatitude());
+        Log.e("lat",""+geoPosition.getCoordinate().getLatitude());
     }
 
     @Override

@@ -9,4 +9,6 @@
     <string name="enter_mobile_number">Mobile:</string>
     <string name="start_navi">Start Navigation</string>
     <string name="stop_navi">Stop Navigation</string>
+    <string name="orders">Orders</string>
+    <string name="no_orders_assigned_yet">No Orders Assigned Yet</string>
 </resources>

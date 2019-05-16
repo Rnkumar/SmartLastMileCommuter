@@ -24,11 +24,16 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.here2k19.projects.smartlastmilecommuter.Delivery.GetDeliveries;
 import com.here2k19.projects.smartlastmilecommuter.R;
+import com.here2k19.projects.smartlastmilecommuter.Routing.Positioning;
 import com.mukesh.OnOtpCompletionListener;
 import com.mukesh.OtpView;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class LoginActivity extends AppCompatActivity{
@@ -41,13 +46,13 @@ public class LoginActivity extends AppCompatActivity{
     private AlertDialog otpDialog;
     private ProgressDialog progressDialog;
     EditText editText;
-public static String name;
+    public String name,mobile;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         loginPhoneNumberEditText= findViewById(R.id.login_mobile_number);
-        editText=findViewById(R.id.name);
+        editText=findViewById(R.id.usrname);
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading...");
         progressDialog.setCancelable(false);
@@ -67,6 +72,7 @@ public static String name;
         if ( loginPhoneNumberEditText.getText() != null ) {
             String phoneNumber = loginPhoneNumberEditText.getText().toString().trim();
             if (!TextUtils.isEmpty(phoneNumber) || phoneNumber.length() >= 10 ) {
+                mobile = phoneNumber;
                 progressDialog.show();
                 PhoneAuthProvider.getInstance().verifyPhoneNumber(
                         phoneNumber,
@@ -122,6 +128,21 @@ public static String name;
                             Log.e(TAG, "signInWithCredential:success");
                             FirebaseUser user = task.getResult().getUser();
                             finish();
+
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("drivers").child(user.getUid());
+                            Map<String,Object> map = new HashMap<>();
+                                Positioning positioning = new Positioning();
+                                positioning.getPos(LoginActivity.this);
+                                map.put("Name",name);
+                                map.put("Mobile",mobile);
+                                map.put("driverId",user.getUid());
+                                map.put("inRide",false);
+                            Map<String,Double> liveLocation = new HashMap<>();
+                                liveLocation.put("latitude",Positioning.latitude);
+                                liveLocation.put("longitude",Positioning.longitude);
+                            map.put("livelocation",liveLocation);
+                            databaseReference.setValue(map);
+
                             startActivity(new Intent(getApplicationContext(), GetDeliveries.class));
                         } else {
                             progressDialog.dismiss();

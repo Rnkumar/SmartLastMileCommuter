@@ -17,10 +17,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Delivery.GetDeliveries"></activity>
-        <activity android:name=".activities.Login" >
+        <activity android:name=".Delivery.GetDeliveries" />
 
-        </activity>
         <activity android:name=".activities.BusinessType">
 
         </activity>

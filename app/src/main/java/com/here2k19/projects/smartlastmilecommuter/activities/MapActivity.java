@@ -26,6 +26,8 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.OnEngineInitListener;
 import com.here.android.mpa.common.ViewObject;
@@ -44,6 +46,8 @@ import com.here.android.mpa.routing.RouteWaypoint;
 import com.here.android.mpa.routing.Router;
 import com.here.android.mpa.routing.RoutingError;
 import com.here2k19.projects.smartlastmilecommuter.Adapter.MapFragmentView;
+import com.here2k19.projects.smartlastmilecommuter.Delivery.GetDeliveries;
+import com.here2k19.projects.smartlastmilecommuter.Delivery.SubOrdersModel;
 import com.here2k19.projects.smartlastmilecommuter.R;
 import com.here2k19.projects.smartlastmilecommuter.Geocoding.MainView;
 import com.here2k19.projects.smartlastmilecommuter.Routing.MapFragmentView1;
@@ -59,8 +63,9 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
 
     // permissions request code
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
-     MapRoute Ordersroute ;
+    MapRoute Ordersroute ;
     AppCompatActivity appCompatActivity;
+    List<SubOrdersModel> productsList = GetDeliveries.staticProducstsList;
     /**
      * Permissions that need to be explicitly requested from end user.
      */
@@ -71,23 +76,23 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
     // map embedded in the map fragment
     public static String vehicle="bike";
     private Map map = null;
-MapRoute adminlocroute;
+    MapRoute adminlocroute;
     // map fragment embedded in this activity
     private SupportMapFragment mapFragment = null;
-CoreRouter coreRouter;
-double adminlat,adminlang;
-int count=0;
-public static GeoCoordinate currentloc,adminloc;
-double currentloclat,currentloclang;
-Button orders;
-public static double nearbyvalue;
-ArrayList<GeoCoordinate> nearbycentres;
-ArrayList<GeoCoordinate> listOfValues;
+    CoreRouter coreRouter;
+    double adminlat,adminlang;
+    int count=0;
+    public static GeoCoordinate currentloc,adminloc;
+    double currentloclat,currentloclang;
+    Button orders;
+    public static double nearbyvalue;
+    ArrayList<GeoCoordinate> nearbycentres;
+    ArrayList<GeoCoordinate> listOfValues;
     ArrayList<GeoCoordinate> orderlocation;
     private MapMarker ordersMarker;
     private MapFragmentView m_mapFragmentView;
-Button bt;
-Button time;
+    Button bt;
+    Button time;
     @Override
     public void onDestroy() {
         m_mapFragmentView.onDestroy();
@@ -98,10 +103,13 @@ Button time;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         checkPermissions();
-setupMapFragmentView();
+        setupMapFragmentView();
        // getAlert();
-        nearbycentres=new ArrayList<GeoCoordinate>();
-        listOfValues=new ArrayList<GeoCoordinate>();
+
+
+
+        nearbycentres= new ArrayList<>();
+        listOfValues= new ArrayList<>();
         nearbycentres.add(new GeoCoordinate(12.9716,80.0434));
         nearbycentres.add(new GeoCoordinate(13.0500,80.2121));
         nearbycentres.add(new GeoCoordinate(13.0382,80.1565));
@@ -136,9 +144,10 @@ setupMapFragmentView();
             if(count==0) {
                 adminlat = Double.parseDouble(MainView.latitude);
                 adminlang = Double.parseDouble(MainView.longitude);
-                adminloc=new GeoCoordinate(adminlat,adminlang);
-            currentloclat= Double.parseDouble(String.valueOf(Positioning.latitude));
-            currentloclang= Double.parseDouble(String.valueOf(Positioning.longitude));
+
+                adminloc= GetDeliveries.adminLoc;
+                currentloclat= Double.parseDouble(String.valueOf(Positioning.latitude));
+                currentloclang= Double.parseDouble(String.valueOf(Positioning.longitude));
             if(map!=null)
             {
                 getAlert();
@@ -210,7 +219,7 @@ setupMapFragmentView();
              if(value==true)
              {
                  vehicle="bike";
-getalert=true;
+                 getalert=true;
              }
              else
              {
@@ -230,13 +239,13 @@ getalert=true;
     }
 
     private void getOrders() {
-    orderlocation=new ArrayList<GeoCoordinate>();
-    orderlocation.add(new GeoCoordinate(adminloc));
-   orderlocation.add(new GeoCoordinate(12.9675,80.1491));
-   orderlocation.add(new GeoCoordinate(12.9516,80.1462));
-   orderlocation.add(new GeoCoordinate(12.9249,80.1000));
-   orderlocation.add(new GeoCoordinate(12.9749,80.1328));
-drawRouteForOrder(orderlocation);
+       orderlocation= new ArrayList<>();
+       orderlocation.add(new GeoCoordinate(adminloc));
+       for(SubOrdersModel subOrdersModel:productsList){
+           String[] ordersLocation = subOrdersModel.getLocation().split(",");
+           orderlocation.add(new GeoCoordinate(Double.parseDouble(ordersLocation[0]),Double.parseDouble(ordersLocation[1])));
+       }
+       drawRouteForOrder(orderlocation);
     }
     public  SupportMapFragment getMapFragment() {
     Log.e("cll","called");
@@ -249,14 +258,14 @@ drawRouteForOrder(orderlocation);
     }
     private void initialize() {
         setContentView(R.layout.activity_map);
-bt=findViewById(R.id.navigation);
-time=findViewById(R.id.tim);
-bt.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-        MapFragmentView1 mapFragmentView1=new MapFragmentView1(MapActivity.this);
-    }
-});
+        bt=findViewById(R.id.navigation);
+        time=findViewById(R.id.tim);
+        bt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MapFragmentView1 mapFragmentView1=new MapFragmentView1(MapActivity.this);
+            }
+        });
         // Search for the map fragment to finish setup by calling init().
 
         mapFragment = getMapFragment();
