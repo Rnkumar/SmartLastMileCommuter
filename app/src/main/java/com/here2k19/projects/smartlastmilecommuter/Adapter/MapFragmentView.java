@@ -9,6 +9,7 @@ import com.here.android.mpa.common.GeoPosition;
 import com.here.android.mpa.common.OnEngineInitListener;
 import com.here.android.mpa.guidance.NavigationManager;
 import com.here.android.mpa.mapping.Map;
+import com.here.android.mpa.mapping.MapMarker;
 import com.here.android.mpa.mapping.SupportMapFragment;
 import com.here.android.mpa.mapping.MapRoute;
 import com.here.android.mpa.routing.CoreRouter;
@@ -22,6 +23,10 @@ import com.here.android.mpa.routing.RoutingError;
 import com.here2k19.projects.smartlastmilecommuter.R;
 import com.here2k19.projects.smartlastmilecommuter.activities.MapActivity;
 
+import android.animation.ValueAnimator;
+import android.graphics.Point;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -32,6 +37,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Interpolator;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,7 +59,7 @@ public class MapFragmentView {
     private GeoBoundingBox m_geoBoundingBox;
     private Route m_route;
     private boolean m_foregroundServiceStarted;
-
+MapMarker mapMarker,mapMarker1;
     public MapFragmentView(MapActivity activity) {
         m_activity = activity;
         initMapFragment();
@@ -153,6 +161,11 @@ public class MapFragmentView {
                             if (routeResults.get(0).getRoute() != null) {
 
                                 m_route = routeResults.get(0).getRoute();
+                             int manuesrs=routeResults.size();
+                             Log.e("mann",""+manuesrs);
+      String roadname=routeResults.get(0).getRoute().getManeuvers().get(0).getRoadName();
+      String turns=""+routeResults.get(0).getRoute().getManeuvers().get(0).getTurn();
+
                                 TextView textView=m_activity.findViewById(R.id.maneveur);
                                 textView.setText("NextRoadName"+routeResults.get(0).getRoute().getManeuvers().get(0).getNextRoadName().toString()
                                 +"\n"+"NextRoad"+routeResults.get(0).getRoute().getManeuvers().get(0).getNextRoadNumber());
@@ -262,6 +275,11 @@ public class MapFragmentView {
         alertDialogBuilder.setPositiveButton("Simulation",new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialoginterface, int i) {
                 m_navigationManager.simulate(m_route,60);//Simualtion speed is set to 60 m/s
+                mapMarker=new MapMarker(new GeoCoordinate(m_route.getStart()));
+                mapMarker1=new MapMarker(new GeoCoordinate(m_route.getDestination()));
+                m_map.addMapObject(mapMarker);
+                m_map.addMapObject(mapMarker1);
+                Animation(mapMarker,mapMarker1);
                 m_map.setTilt(60);
                 startForegroundService();
             };
@@ -327,11 +345,13 @@ public class MapFragmentView {
         public void onMapUpdateModeChanged(NavigationManager.MapUpdateMode mapUpdateMode) {
             Toast.makeText(m_activity, "Map update mode is changed to " + mapUpdateMode,
                     Toast.LENGTH_SHORT).show();
+
         }
 
         @Override
         public void onRouteUpdated(Route route) {
             Toast.makeText(m_activity, "Route updated", Toast.LENGTH_SHORT).show();
+
         }
 
         @Override
@@ -348,4 +368,23 @@ public class MapFragmentView {
             m_navigationManager.stop();
         }
     }
+  //  }
+    public void Animation(final MapMarker mapMarker, MapMarker mapMarker1)
+    {
+        double[] startValues = new double[]{mapMarker.getCoordinate().getLatitude(),mapMarker.getCoordinate().getLongitude()};
+        double[] endValues = new double[]{mapMarker1.getCoordinate().getLatitude(), mapMarker1.getCoordinate().getLongitude()};
+        ValueAnimator latLngAnimator = ValueAnimator.ofObject(new DoubleArrayEvaluator(), startValues, endValues);
+        latLngAnimator.setDuration(5000);
+        latLngAnimator.setInterpolator(new DecelerateInterpolator());
+        latLngAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                double[] animatedValue = (double[]) animation.getAnimatedValue();
+                //marker.setPosition(new LatLng(animatedValue[0], animatedValue[1]));
+            mapMarker.setCoordinate(new GeoCoordinate(animatedValue[0],animatedValue[1]));
+            }
+        });
+        latLngAnimator.start();
+    }
+
 }

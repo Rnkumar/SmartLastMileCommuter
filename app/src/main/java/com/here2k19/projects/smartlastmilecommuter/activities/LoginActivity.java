@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,12 +40,14 @@ public class LoginActivity extends AppCompatActivity{
     private TextView resultText;
     private AlertDialog otpDialog;
     private ProgressDialog progressDialog;
-
+    EditText editText;
+public static String name;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         loginPhoneNumberEditText= findViewById(R.id.login_mobile_number);
+        editText=findViewById(R.id.name);
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Loading...");
         progressDialog.setCancelable(false);
@@ -60,6 +63,7 @@ public class LoginActivity extends AppCompatActivity{
     }
 
     public void getOtp(View view) {
+        name=editText.getText().toString();
         if ( loginPhoneNumberEditText.getText() != null ) {
             String phoneNumber = loginPhoneNumberEditText.getText().toString().trim();
             if (!TextUtils.isEmpty(phoneNumber) || phoneNumber.length() >= 10 ) {
