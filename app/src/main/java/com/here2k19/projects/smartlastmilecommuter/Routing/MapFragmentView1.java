@@ -7,6 +7,8 @@ import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.here.android.mpa.common.GeoCoordinate;
@@ -23,6 +25,7 @@ import com.here.android.mpa.mapping.MapMarker;
 import com.here.android.mpa.mapping.MapState;
 import com.here.android.mpa.mapping.OnMapRenderListener;
 import com.here.android.mpa.routing.CoreRouter;
+import com.here.android.mpa.routing.Maneuver;
 import com.here.android.mpa.routing.Route;
 import com.here.android.mpa.routing.RoutePlan;
 import com.here.android.mpa.routing.RouteResult;
@@ -42,10 +45,10 @@ import java.util.List;
  * - using a MapMarker as position indicator and how to make the movements smooth and
  * synchronized with map movements.
  */
-public class MapFragmentView1 {
+public class MapFragmentView1 extends NavigationManager.NewInstructionEventListener {
     private SupportMapFragment m_mapFragment;
     private Map m_map;
-
+NavigationManager navigationManager;
     private MapMarker m_positionIndicatorFixed = null;
     private PointF m_mapTransformCenter;
     private boolean m_returningToRoadViewMode = false;
@@ -59,6 +62,32 @@ public class MapFragmentView1 {
 
     private SupportMapFragment getMapFragment() {
         return (SupportMapFragment) m_activity.getSupportFragmentManager().findFragmentById(R.id.mapfragment);
+    }
+
+    public MapFragmentView1() {
+        super();
+    }
+
+    @Override
+    public void onNewInstructionEvent() {
+        //super.onNewInstructionEvent();
+        navigationManager=NavigationManager.getInstance();
+        Maneuver maneuver = navigationManager.getNextManeuver();
+        if (maneuver != null) {
+            if (maneuver.getAction() == Maneuver.Action.END) {
+                // notify the user that the route is complete
+            Toast.makeText(m_activity,"Route is complete",Toast.LENGTH_LONG);
+            }
+            TextView textView=m_activity.findViewById(R.id.maneveur);
+            String roadInformation=maneuver.getRoadName();
+            String nextManeuver=""+maneuver.getDistanceToNextManeuver();
+            String turn=""+maneuver.getTurn();
+           String Traffic=""+maneuver.getTrafficDirection();
+           textView.setText("Road Information  :"+roadInformation+
+                   "\nNextManeuver Distance"+nextManeuver+"\nTurn"+turn+"\nTraffic :"+Traffic);
+            // display current or next road information
+            // display maneuver.getDistanceToNextManeuver()
+        }
     }
 
     private void initMapFragment() {
@@ -187,12 +216,14 @@ public class MapFragmentView1 {
             public void onPreDraw() {
                 if (m_positionIndicatorFixed != null) {
                     if (NavigationManager.getInstance()
-                            .getMapUpdateMode().equals(NavigationManager.MapUpdateMode.ROADVIEW)) {
+                            .getMapUpdateMode().equals(NavigationManager.MapUpdateMode.ROADVIEW))
+                    {
                         if (!m_returningToRoadViewMode) {
                             // when road view is active, we set the position indicator to align
                             // with the current map transform center to synchronize map and map
                             // marker movements.
                             m_positionIndicatorFixed.setCoordinate(m_map.pixelToGeo(m_mapTransformCenter));
+                        onNewInstructionEvent();
                         }
                     }
                 }
