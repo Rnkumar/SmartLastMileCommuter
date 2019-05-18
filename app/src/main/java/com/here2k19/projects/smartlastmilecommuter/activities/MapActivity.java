@@ -1,7 +1,9 @@
 package com.here2k19.projects.smartlastmilecommuter.activities;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -44,6 +46,7 @@ import com.here2k19.projects.smartlastmilecommuter.Adapter.MapFragmentView;
 import com.here2k19.projects.smartlastmilecommuter.Delivery.GetDeliveries;
 import com.here2k19.projects.smartlastmilecommuter.Delivery.SubOrdersModel;
 import com.here2k19.projects.smartlastmilecommuter.Geocoding.MainView;
+import com.here2k19.projects.smartlastmilecommuter.Notification.SendNotification;
 import com.here2k19.projects.smartlastmilecommuter.R;
 import com.here2k19.projects.smartlastmilecommuter.Routing.MapFragmentView1;
 import com.here2k19.projects.smartlastmilecommuter.Routing.Positioning;
@@ -112,6 +115,10 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
             public void onClick(View v) {
                 getOrders();
                 if(orderlocation!=null){
+                    SharedPreferences sharedPreferences = getSharedPreferences("commuter", Context.MODE_PRIVATE);
+                    String name = sharedPreferences.getString("name","");
+                    String mobile = sharedPreferences.getString("mobile","");
+                    SendNotification.notify(MapActivity.this,"push","Your items will be delivered by "+name+"("+mobile+")today.");
                     Waypoints waypoints=new Waypoints();
                     waypoints.getWaypoints(orderlocation, MapActivity.this, new WaypointListener() {
                         @Override

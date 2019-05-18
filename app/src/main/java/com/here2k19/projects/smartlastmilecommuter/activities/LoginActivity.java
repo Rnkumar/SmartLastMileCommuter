@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -192,6 +193,8 @@ public class LoginActivity extends AppCompatActivity{
                             finish();
                             Positioning positioning = new Positioning();
                             positioning.getPos(LoginActivity.this);
+                            SharedPreferences sharedPreferences = getSharedPreferences("commuter",Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("drivers").child(user.getUid());
                             Map<String,Object> map = new HashMap<>();
                                 map.put("Name",name);
@@ -200,6 +203,9 @@ public class LoginActivity extends AppCompatActivity{
                                 map.put("VehicleType","Bike");
                                 map.put("driverId",user.getUid());
                                 map.put("inRide",false);
+                                editor.putString("name",name);
+                                editor.putString("mobile",mobile);
+                                editor.apply();
                                 Map<String,Double> liveLocation = new HashMap<>();
                                 liveLocation.put("latitude",Positioning.latitude);
                                 liveLocation.put("longitude",Positioning.longitude);

@@ -27,10 +27,12 @@ public class SendNotification {
                 if (task.isSuccessful()) {
                     result = task.getResult().getData().toString();
                 }
+
                 else {
                     Log.e("Error",task.getException().getMessage());
                     result = "Failed";
                 }
+
                 Toast.makeText(context, "Result:"+result, Toast.LENGTH_SHORT).show();
                 return result;
             }
