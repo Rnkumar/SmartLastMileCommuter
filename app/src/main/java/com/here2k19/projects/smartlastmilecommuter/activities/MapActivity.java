@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.here.android.mpa.common.GeoCoordinate;
@@ -56,23 +57,20 @@ import java.util.List;
 
 public class MapActivity extends FragmentActivity implements CoreRouter.Listener {
 
-    // permissions request code
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
     MapRoute Ordersroute ;
     AppCompatActivity appCompatActivity;
     List<SubOrdersModel> productsList = GetDeliveries.staticProducstsList;
-    /**
-     * Permissions that need to be explicitly requested from end user.
-     */
+
     boolean getalert=false;
     private static final String[] REQUIRED_SDK_PERMISSIONS = new String[] {
             Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE };
     boolean value,value1=false;
-    // map embedded in the map fragment
+
     public static String vehicle="bike";
     private Map map = null;
     MapRoute adminlocroute;
-    // map fragment embedded in this activity
+
     private SupportMapFragment mapFragment = null;
     CoreRouter coreRouter;
     double adminlat,adminlang;
@@ -87,7 +85,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
     private MapMarker ordersMarker;
     private MapFragmentView m_mapFragmentView;
     Button bt;
-    Button time;
+    TextView time;
     @Override
     public void onDestroy() {
         m_mapFragmentView.onDestroy();
@@ -122,14 +120,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
             }
         });
         appCompatActivity=new AppCompatActivity();
-        final String admin_loc=getIntent().getExtras().getString("admin_loc");
-        if(admin_loc!=null)
-        {
-            MainView mainView=new MainView(MapActivity.this);
-
-            if(MainView.initMap) {
-            mainView.triggerGeocodeRequest(admin_loc);
-        }
+        final GeoCoordinate admin_loc=GetDeliveries.adminLoc;
             Handler handler=new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
@@ -139,8 +130,6 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
             if(count==0) {
                 adminlat = Double.parseDouble(MainView.latitude);
                 adminlang = Double.parseDouble(MainView.longitude);
-
-                adminloc= GetDeliveries.adminLoc;
                 currentloclat= Double.parseDouble(String.valueOf(Positioning.latitude));
                 currentloclang= Double.parseDouble(String.valueOf(Positioning.longitude));
             if(map!=null)
@@ -153,7 +142,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
                        if(getalert) {
                            ArrayList<MapObject> markers = new ArrayList<MapObject>();
                            markers.add(new MapMarker(new GeoCoordinate(currentloclat, currentloclang)).setTitle("ahii").setDescription("dfdf"));
-                           markers.add(new MapMarker(new GeoCoordinate(adminlat, adminlang)).setTitle(admin_loc));
+                           markers.add(new MapMarker(new GeoCoordinate(adminlat, adminlang)).setTitle(admin_loc.getLatitude()+","+admin_loc.getLongitude()));
                            map.addMapObjects(markers);
 
                            map.setCenter(new GeoCoordinate(currentloclat, currentloclang, 0.0),
@@ -171,8 +160,6 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
                     }
                 }
             },2000);
-
-        }
     }
 
     private void getAlert() {
@@ -238,7 +225,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
        orderlocation.add(new GeoCoordinate(adminloc));
        for(SubOrdersModel subOrdersModel:productsList){
            String[] ordersLocation = subOrdersModel.getLocation().split(",");
-           orderlocation.add(new GeoCoordinate(Double.parseDouble(ordersLocation[0]),Double.parseDouble(ordersLocation[1])));
+           orderlocation.add(new GeoCoordinate(Double.parseDouble(ordersLocation[0]),Double.parseDouble(ordersLocation[1].trim())));
        }
        drawRouteForOrder(orderlocation);
     }

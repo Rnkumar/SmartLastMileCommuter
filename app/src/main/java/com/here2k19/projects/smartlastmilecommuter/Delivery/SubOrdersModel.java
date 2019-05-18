@@ -4,11 +4,34 @@ import java.util.Date;
 
 public class SubOrdersModel {
 
-    private String mobile, Address, ItemName, Location, userId, orderId, driverName, driverMobile;
+    private String mobile, Address, ItemName, Location, userId, orderId, driverName, driverMobile, driverId;
     private Date date;
     private boolean published, delivered;
     private int quantity;
 
+    public String getDriverId() {
+        return driverId;
+    }
+
+    public void setDriverId(String driverId) {
+        this.driverId = driverId;
+    }
+
+    public SubOrdersModel(String mobile, String address, String itemName, String location, String userId, String orderId, String driverName, String driverMobile, String driverId, Date date, boolean published, boolean delivered, int quantity) {
+        this.mobile = mobile;
+        Address = address;
+        ItemName = itemName;
+        Location = location;
+        this.userId = userId;
+        this.orderId = orderId;
+        this.driverName = driverName;
+        this.driverMobile = driverMobile;
+        this.driverId = driverId;
+        this.date = date;
+        this.published = published;
+        this.delivered = delivered;
+        this.quantity = quantity;
+    }
 
     public String getDriverName() {
         return driverName;
@@ -55,7 +78,7 @@ public class SubOrdersModel {
     public SubOrdersModel(String mobile, String address, String itemName, String location, String userId, boolean published, boolean delivered, int quantity, String orderId, Date date) {
         this.mobile = mobile;
         this.Address = address;
-        this.ItemName = itemName;
+        this.ItemName = itemName;http://localhost:5000/#/CreateItems
         this.Location = location;
         this.userId = userId;
         this.published = published;
@@ -135,5 +158,10 @@ public class SubOrdersModel {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    @Override
+    public String toString() {
+        return getItemName()+","+getAddress()+","+getDriverId()+","+getDriverMobile()+","+getDriverName()+","+getLocation()+","+getMobile()+","+getOrderId()+","+getUserId()+","+getDate()+","+getQuantity();
     }
 }

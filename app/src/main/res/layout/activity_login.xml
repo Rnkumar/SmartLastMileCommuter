@@ -25,6 +25,8 @@
 <EditText
     android:hint="Name"
     android:id="@+id/usrname"
+    android:singleLine="true"
+    android:maxLines="1"
     android:layout_marginTop="40dp"
     android:layout_below="@+id/logo_view"
     android:layout_width="match_parent"
@@ -41,6 +43,7 @@
             android:id="@+id/login_mobile_number"
             android:layout_width="match_parent"
             android:lines="1"
+            android:maxLength="13"
             android:singleLine="true"
             android:inputType="phone"
             android:layout_height="wrap_content" />

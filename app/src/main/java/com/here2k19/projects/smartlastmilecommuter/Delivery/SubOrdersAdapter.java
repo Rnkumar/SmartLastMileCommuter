@@ -30,31 +30,20 @@ public class SubOrdersAdapter extends RecyclerView.Adapter<SubOrdersAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         LayoutInflater inflater = LayoutInflater.from(mCtx);
-        View view = inflater.inflate(R.layout.layout_deliveries, null);
+        View view = inflater.inflate(R.layout.item_order, null);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
-        SubOrdersModel deliveries=productList.get(i);
-        viewHolder.item.setText(deliveries.getItemName());
-        viewHolder.quantity.setText(deliveries.getQuantity());
-        viewHolder.location.setText(deliveries.getAddress());
-        /*viewHolder.bt.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              //  Toast.makeText(mCtx,"OkClicked",Toast.LENGTH_LONG).show();
-                Intent intent=new Intent(mCtx, MapActivity.class);
-                intent.putExtra("admin_loc",viewHolder.location.getText().toString());
-                mCtx.startActivity(intent);
-            }
-        });
-        viewHolder.bt1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(mCtx,"CloseClicked",Toast.LENGTH_LONG).show();
-            }
-        });*/
+        SubOrdersModel ordersModel=productList.get(i);
+
+        viewHolder.orderId.setText(String.format("%s%s", viewHolder.orderId.getText().toString(), ordersModel.getOrderId()));
+        viewHolder.quantity.setText(String.format("%s%s", viewHolder.quantity.getText().toString(), String.valueOf(ordersModel.getQuantity())));
+        viewHolder.deliveryLocation.setText(String.format("%s%s", viewHolder.deliveryLocation.getText(), ordersModel.getAddress()));
+        viewHolder.mobile.setText(String.format("%s%s",viewHolder.mobile.getText(),ordersModel.getMobile()));
+        viewHolder.name.setText(String.format("%s%s", viewHolder.name.getText().toString(), ordersModel.getItemName()));
+
     }
 
     @Override
@@ -63,17 +52,14 @@ public class SubOrdersAdapter extends RecyclerView.Adapter<SubOrdersAdapter.View
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
-        TextView item,quantity,location;
-        Button bt,bt1;
+        private TextView orderId, quantity, name, mobile,deliveryLocation;
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            item=itemView.findViewById(R.id.itemvalue);
-            quantity=itemView.findViewById(R.id.quantityvalue);
-            location=itemView.findViewById(R.id.locvalue);
-            bt=itemView.findViewById(R.id.okbt);
-            bt1=itemView.findViewById(R.id.clostbt);
-            bt.setVisibility(View.GONE);
-            bt1.setVisibility(View.GONE);
+            orderId = itemView.findViewById(R.id.order_item_id);
+            quantity = itemView.findViewById(R.id.return_item_quantity);
+            name = itemView.findViewById(R.id.return_item_name);
+            mobile = itemView.findViewById(R.id.mobile);
+            deliveryLocation = itemView.findViewById(R.id.return_item_delivery_location);
         }
     }
 }
