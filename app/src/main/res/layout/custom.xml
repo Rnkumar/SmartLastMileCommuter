@@ -2,22 +2,27 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/layout_root"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:orientation="horizontal"
     android:background="@android:color/transparent"
     android:padding="10dp" >
 
     <ImageButton
+        android:layout_gravity="center"
         android:id="@+id/car"
-        android:layout_marginLeft="100dp"
         android:background="@drawable/car"
-        android:layout_width="150dp"
-        android:layout_height="150dp" />
+        android:layout_width="100dp"
+        android:layout_height="90dp" />
+    <Space
+        android:layout_width="20dp"
+        android:layout_height="wrap_content" />
     <ImageButton
+        android:layout_marginTop="5dp"
+        android:layout_gravity="center"
         android:id="@+id/bike"
-        android:layout_marginLeft="100dp"
         android:background="@drawable/bike"
         android:backgroundTint="#537CFF"
-        android:layout_width="150dp"
-        android:layout_height="150dp" />
+        android:layout_width="100dp"
+        android:layout_height="90dp" />
 </LinearLayout>

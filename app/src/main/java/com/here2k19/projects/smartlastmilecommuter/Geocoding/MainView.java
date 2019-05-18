@@ -17,6 +17,7 @@ import com.here.android.mpa.search.ReverseGeocodeRequest;
 import com.here2k19.projects.smartlastmilecommuter.activities.MapActivity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.location.LocationListener;
@@ -35,7 +36,7 @@ import android.widget.Toast;
  */
 public class MainView {
    // private static final Object TODO ="sdf" ;
-    private AppCompatActivity m_activity;
+    private Activity m_activity;
     MapActivity mapActivity;
     private TextView m_resultTextView;
     LocationManager locationManager;
@@ -49,7 +50,7 @@ public class MainView {
     public static String latitude,longitude=null;
     boolean mapAct=false;
 ProgressDialog progressDialog=null;
-    public MainView(final AppCompatActivity activity) {
+    public MainView(final Activity activity) {
          progressDialog=new ProgressDialog(activity);
         progressDialog.setTitle("Wait we are allocating the job with respected to location ");
         progressDialog.setCancelable(false);

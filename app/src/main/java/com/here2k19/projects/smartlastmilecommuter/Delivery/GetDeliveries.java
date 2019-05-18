@@ -75,6 +75,9 @@ public class GetDeliveries extends AppCompatActivity  {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Log.e("Loc",Positioning.latitude+","+Positioning.longitude);
+
                 if(flag){
                     Intent intent = new Intent(GetDeliveries.this, MapActivity.class);
                     staticProducstsList = productList;

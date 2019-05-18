@@ -127,11 +127,10 @@ public class LoginActivity extends AppCompatActivity{
                             Log.e(TAG, "signInWithCredential:success");
                             FirebaseUser user = task.getResult().getUser();
                             finish();
-
+                            Positioning positioning = new Positioning();
+                            positioning.getPos(LoginActivity.this);
                             DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("drivers").child(user.getUid());
                             Map<String,Object> map = new HashMap<>();
-                                Positioning positioning = new Positioning();
-                                positioning.getPos(LoginActivity.this);
                                 map.put("Name",name);
                                 map.put("Mobile",mobile);
                                 map.put("Address","Unknown");
@@ -141,9 +140,10 @@ public class LoginActivity extends AppCompatActivity{
                             Map<String,Double> liveLocation = new HashMap<>();
                                 liveLocation.put("latitude",Positioning.latitude);
                                 liveLocation.put("longitude",Positioning.longitude);
+
                             map.put("livelocation",liveLocation);
                             databaseReference.setValue(map);
-
+                            positioning.stopPositioning();
                             startActivity(new Intent(getApplicationContext(), GetDeliveries.class));
                         } else {
                             progressDialog.dismiss();

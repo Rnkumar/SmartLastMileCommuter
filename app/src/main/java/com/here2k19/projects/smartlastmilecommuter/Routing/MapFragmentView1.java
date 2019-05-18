@@ -106,7 +106,7 @@ NavigationManager navigationManager;
 
                             // these two waypoints cover suburban roads
                             routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(Positioning.latitude,Positioning.longitude)));
-                            routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(MapActivity.adminloc)));
+                            routePlan.addWaypoint(new RouteWaypoint(MapActivity.adminloc));
 
                             try {
                                 // calculate a route for navigation

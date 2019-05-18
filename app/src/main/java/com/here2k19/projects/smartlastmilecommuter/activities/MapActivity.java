@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
@@ -58,27 +57,24 @@ import java.util.List;
 public class MapActivity extends FragmentActivity implements CoreRouter.Listener {
 
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
-    MapRoute Ordersroute ;
+    MapRoute ordersRoute;
     AppCompatActivity appCompatActivity;
     List<SubOrdersModel> productsList = GetDeliveries.staticProducstsList;
 
-    boolean getalert=false;
     private static final String[] REQUIRED_SDK_PERMISSIONS = new String[] {
             Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE };
     boolean value,value1=false;
 
     public static String vehicle="bike";
     private Map map = null;
-    MapRoute adminlocroute;
+    MapRoute adminLocationRoute;
 
     private SupportMapFragment mapFragment = null;
     CoreRouter coreRouter;
-    double adminlat,adminlang;
-    int count=0;
+
     public static GeoCoordinate currentloc,adminloc;
     double currentloclat,currentloclang;
     Button orders;
-    public static double nearbyvalue;
     ArrayList<GeoCoordinate> nearbycentres;
     ArrayList<GeoCoordinate> listOfValues;
     ArrayList<GeoCoordinate> orderlocation;
@@ -97,8 +93,10 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
         super.onCreate(savedInstanceState);
         checkPermissions();
         adminloc=GetDeliveries.adminLoc;
+//        Positioning positioning = new Positioning();
+//        positioning.getPos(MapActivity.this);
         setupMapFragmentView();
-        getAlert();
+        //getAlert();
 
 
 
@@ -122,35 +120,34 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
         });
         appCompatActivity=new AppCompatActivity();
 
-            Handler handler=new Handler();
+           /* Handler handler=new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    if(MainView.latitude!=null && MainView.longitude!=null)
+                    if(MainView.latitude!=null && MainView.longitude!=null){
+                    if(count==0) {
+                        adminlat = Double.parseDouble(MainView.latitude);
+                        adminlang = Double.parseDouble(MainView.longitude);
+                        currentloclat= Double.parseDouble(String.valueOf(Positioning.latitude));
+                        currentloclang= Double.parseDouble(String.valueOf(Positioning.longitude));
+                    if(map!=null)
                     {
-            if(count==0) {
-                adminlat = Double.parseDouble(MainView.latitude);
-                adminlang = Double.parseDouble(MainView.longitude);
-                currentloclat= Double.parseDouble(String.valueOf(Positioning.latitude));
-                currentloclang= Double.parseDouble(String.valueOf(Positioning.longitude));
-            if(map!=null)
-            {
-                getAlert();
-               Handler handler1=new Handler();
-               handler1.postDelayed(new Runnable() {
-                   @Override
-                   public void run() {
-                       if(getalert) {
-                           ArrayList<MapObject> markers = new ArrayList<MapObject>();
-                           markers.add(new MapMarker(new GeoCoordinate(currentloclat, currentloclang)).setTitle("ahii").setDescription("dfdf"));
-                           markers.add(new MapMarker(new GeoCoordinate(adminlat, adminlang)).setTitle(adminloc.getLatitude()+","+adminloc.getLongitude()));
-                           map.addMapObjects(markers);
+                        getAlert();
+                       Handler handler1=new Handler();
+                       handler1.postDelayed(new Runnable() {
+                           @Override
+                           public void run() {
+                               if(getalert) {
+                                   ArrayList<MapObject> markers = new ArrayList<MapObject>();
+                                   markers.add(new MapMarker(new GeoCoordinate(currentloclat, currentloclang)).setTitle("ahii").setDescription("dfdf"));
+                                   markers.add(new MapMarker(new GeoCoordinate(adminlat, adminlang)).setTitle(adminloc.getLatitude()+","+adminloc.getLongitude()));
+                                   map.addMapObjects(markers);
 
-                           map.setCenter(new GeoCoordinate(currentloclat, currentloclang, 0.0),
-                                   Map.Animation.NONE);
-                       }
-                   }
-               },5000);
+                                   map.setCenter(new GeoCoordinate(currentloclat, currentloclang, 0.0),
+                                           Map.Animation.NONE);
+                               }
+                           }
+                       },5000);
 
 
             }
@@ -160,7 +157,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
             }
                     }
                 }
-            },2000);
+            },2000);*/
     }
 
     private void getAlert() {
@@ -193,6 +190,8 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
                 MapActivity.this);
 
+        alertDialogBuilder.setTitle("Select mode of Transport:");
+
         alertDialogBuilder.setView(promptsView);
         alertDialogBuilder
                 .setCancelable(false)
@@ -201,12 +200,19 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
                             public void onClick(DialogInterface dialog,int id) {
              if(value){
                  vehicle="bike";
-                 getalert=true;
              }else{
                  vehicle="car";
-             getalert=true;
+
              }
-             Log.e("vehicle",vehicle);
+                                ArrayList<MapObject> markers = new ArrayList<MapObject>();
+                                markers.add(new MapMarker(new GeoCoordinate(currentloclat, currentloclang)).setTitle("ahii").setDescription("dfdf"));
+                                markers.add(new MapMarker(new GeoCoordinate(adminloc.getLatitude(), adminloc.getLongitude())).setTitle(adminloc.getLatitude()+","+adminloc.getLongitude()));
+                                map.addMapObjects(markers);
+                                map.setCenter(new GeoCoordinate(currentloclat, currentloclang, 0.0),
+                                        Map.Animation.NONE);
+                                drawRoute(adminloc,currentloc);
+
+
                             }
                         });
 
@@ -267,6 +273,12 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
                         // Set the map center to the Vancouver region (no animation)
                         // Set the zoom level to the average between min and max
                         map.setZoomLevel(15);
+                        currentloclat = Double.parseDouble(String.valueOf(Positioning.latitude));
+                        currentloclang = Double.parseDouble(String.valueOf(Positioning.longitude));
+                        Log.e("Current Location: ",currentloclat+","+currentloclang);
+                        getAlert();
+
+
 
                         if(mapFragment!=null)
                         {
@@ -449,14 +461,13 @@ for(int i=0;i<listOfValues.size();i++)
     private void drawRoute(GeoCoordinate adminloc, GeoCoordinate currentloc) {
         coreRouter=new CoreRouter();
         RoutePlan routePlan=new RoutePlan();
-        routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(adminloc)));
-        routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(currentloc)));
+        routePlan.addWaypoint(new RouteWaypoint(adminloc));
+        routePlan.addWaypoint(new RouteWaypoint(currentloc));
         RouteOptions routeOptions = new RouteOptions();
         if(vehicle.equals("bike")) {
             routeOptions.setTransportMode(RouteOptions.TransportMode.SCOOTER);
             routeOptions.setRouteType(RouteOptions.Type.FASTEST);
             routePlan.setRouteOptions(routeOptions);
-
         }
         else
         {
@@ -482,8 +493,8 @@ for(int i=0;i<listOfValues.size();i++)
                         time.setText(duration+"min");
                     }
 
-                    adminlocroute = new MapRoute(routeResults.get(0).getRoute());
-                    map.addMapObject(adminlocroute);
+                    adminLocationRoute = new MapRoute(routeResults.get(0).getRoute());
+                    map.addMapObject(adminLocationRoute);
 
                 }
                 else {
@@ -495,24 +506,23 @@ for(int i=0;i<listOfValues.size();i++)
 
 private void drawRouteForOrder(ArrayList<GeoCoordinate> arrayList)
 {
-    if(adminlocroute!=null)
+    if(adminLocationRoute !=null)
     {
-        map.removeMapObject(adminlocroute);
+        map.removeMapObject(adminLocationRoute);
     }
     coreRouter=new CoreRouter();
     RoutePlan routePlan=new RoutePlan();
     MainView mainView=new MainView(this);
     double lat,lang;
-for(int i=0;i<arrayList.size();i++)
-{
-    routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(arrayList.get(i))));
-    lat=arrayList.get(i).getLatitude();
-    lang=arrayList.get(i).getLongitude();
-    mainView.triggerRevGeocodeRequest(lat,lang);
-    ordersMarker=new MapMarker(new GeoCoordinate(arrayList.get(i))).setTitle(""+i);
-//    Log.e("MapActRev",MainView.revvalue);
-    map.addMapObject(ordersMarker);
-}
+    for(int i=0;i<arrayList.size();i++) {
+        routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(arrayList.get(i))));
+        lat=arrayList.get(i).getLatitude();
+        lang=arrayList.get(i).getLongitude();
+        mainView.triggerRevGeocodeRequest(lat,lang);
+        ordersMarker=new MapMarker(new GeoCoordinate(arrayList.get(i))).setTitle(""+i);
+    //    Log.e("MapActRev",MainView.revvalue);
+        map.addMapObject(ordersMarker);
+    }
 
 
     RouteOptions routeOptions = new RouteOptions();
@@ -544,8 +554,8 @@ for(int i=0;i<arrayList.size();i++)
                {
                    time.setText(duration+"min");
                }
-                Ordersroute = new MapRoute(routeResults.get(0).getRoute());
-                map.addMapObject(Ordersroute);
+                ordersRoute = new MapRoute(routeResults.get(0).getRoute());
+                map.addMapObject(ordersRoute);
 
             }
             else {
