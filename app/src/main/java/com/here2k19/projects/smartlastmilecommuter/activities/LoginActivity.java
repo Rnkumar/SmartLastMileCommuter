@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.goodiebag.pinview.Pinview;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseException;
@@ -29,8 +30,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.here2k19.projects.smartlastmilecommuter.Delivery.GetDeliveries;
 import com.here2k19.projects.smartlastmilecommuter.R;
 import com.here2k19.projects.smartlastmilecommuter.Routing.Positioning;
-import com.mukesh.OnOtpCompletionListener;
-import com.mukesh.OtpView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -135,6 +134,8 @@ public class LoginActivity extends AppCompatActivity{
                                 positioning.getPos(LoginActivity.this);
                                 map.put("Name",name);
                                 map.put("Mobile",mobile);
+                                map.put("Address","Unknown");
+                                map.put("VehicleType","Bike");
                                 map.put("driverId",user.getUid());
                                 map.put("inRide",false);
                             Map<String,Double> liveLocation = new HashMap<>();
@@ -163,11 +164,13 @@ public class LoginActivity extends AppCompatActivity{
 
         resultText = view.findViewById(R.id.result_text);
 
-        OtpView otpView = view.findViewById(R.id.otp_view);
-        otpView.setOtpCompletionListener(new OnOtpCompletionListener() {
-            @Override public void onOtpCompleted(String otp) {
-                Toast.makeText(LoginActivity.this, "OTP:"+otp, Toast.LENGTH_SHORT).show();
-                PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, otp);
+        Pinview otpView = view.findViewById(R.id.otp_view);
+
+        otpView.setPinViewEventListener(new Pinview.PinViewEventListener() {
+            @Override
+            public void onDataEntered(Pinview pinview, boolean fromUser) {
+                Toast.makeText(LoginActivity.this, "OTP:"+pinview.getValue(), Toast.LENGTH_SHORT).show();
+                PhoneAuthCredential credential = PhoneAuthProvider.getCredential(mVerificationId, pinview.getValue());
                 signInWithPhoneAuthCredential(credential);
             }
         });

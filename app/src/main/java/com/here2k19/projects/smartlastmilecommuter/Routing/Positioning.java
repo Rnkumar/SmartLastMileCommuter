@@ -27,8 +27,6 @@ public static double latitude,longitude;
 }
 
     private void initMapEngine() {
-        // Set path of isolated disk cache
-
             boolean success = com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(
                     m_activity.getExternalFilesDir(null) + File.separator + ".here-maps",
                     "com.here2k19.projects.smartlastmilecommuter.MapService");

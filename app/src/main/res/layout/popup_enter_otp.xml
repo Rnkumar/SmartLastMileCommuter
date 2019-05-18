@@ -11,24 +11,24 @@
         android:layout_height="wrap_content"
         android:text="@string/enter_otp"
         android:textSize="20sp"
+
         android:textColor="@color/colorPrimary"
         android:layout_centerHorizontal="true"
         />
-    <com.mukesh.OtpView
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_below="@id/enter_otp_text"
+    <com.goodiebag.pinview.Pinview
         android:id="@+id/otp_view"
-        android:layout_centerHorizontal="true"
-        android:layout_width="wrap_content"
+        android:layout_below="@id/enter_otp_text"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:inputType="number"
-        android:textColor="@color/colorAccent"
-        app:itemCount="6"
-        app:lineColor="@color/colorAccent"
-        app:viewType="line"
-        />
+        app:pinWidth="30dp"
+        app:pinHeight="40dp"
+        app:pinLength="6"
+        app:cursorVisible="false"
+        app:forceKeyboard="true"
+        app:hint="0"
+        app:inputType="text"
+        app:password="false"/>
 
     <TextView
         android:layout_below="@id/otp_view"

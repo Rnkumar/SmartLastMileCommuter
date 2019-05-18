@@ -57,10 +57,11 @@ public class GetDeliveries extends AppCompatActivity  {
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Map<String, String> map = (Map<String, String>) dataSnapshot.getValue();
-                double latitude = Double.parseDouble(map.get("latitude"));
-                double longitude = Double.parseDouble(map.get("longitude"));
-                adminLoc = new GeoCoordinate(latitude,longitude);
+                Log.e("Data",dataSnapshot.getValue().toString());
+//                Map<String, String> map = (Map<String, String>) dataSnapshot.getValue();
+//                double latitude = Double.parseDouble(map.get("latitude"));
+//                double longitude = Double.parseDouble(map.get("longitude"));
+//                adminLoc = new GeoCoordinate(latitude,longitude);
 
             }
 

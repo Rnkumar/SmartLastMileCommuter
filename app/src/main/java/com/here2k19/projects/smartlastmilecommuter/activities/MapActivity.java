@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PointF;
-import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,13 +20,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.OnEngineInitListener;
 import com.here.android.mpa.common.ViewObject;
@@ -48,8 +43,8 @@ import com.here.android.mpa.routing.RoutingError;
 import com.here2k19.projects.smartlastmilecommuter.Adapter.MapFragmentView;
 import com.here2k19.projects.smartlastmilecommuter.Delivery.GetDeliveries;
 import com.here2k19.projects.smartlastmilecommuter.Delivery.SubOrdersModel;
-import com.here2k19.projects.smartlastmilecommuter.R;
 import com.here2k19.projects.smartlastmilecommuter.Geocoding.MainView;
+import com.here2k19.projects.smartlastmilecommuter.R;
 import com.here2k19.projects.smartlastmilecommuter.Routing.MapFragmentView1;
 import com.here2k19.projects.smartlastmilecommuter.Routing.Positioning;
 import com.here2k19.projects.smartlastmilecommuter.Routing.Waypoints;
@@ -258,7 +253,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
     }
     private void initialize() {
         setContentView(R.layout.activity_map);
-        bt=findViewById(R.id.navigation);
+        bt=findViewById(R.id.navigation_btn);
         time=findViewById(R.id.tim);
         bt.setOnClickListener(new View.OnClickListener() {
             @Override
