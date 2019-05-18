@@ -38,19 +38,27 @@ public class Positioning implements PositioningManager.OnPositionChangedListener
                 MapEngine.getInstance().init(new ApplicationContext(m_activity.getApplicationContext()), new OnEngineInitListener() {
                     @Override
                     public void onEngineInitializationCompleted(Error error) {
-                        m_hereDataSource = LocationDataSourceHERE.getInstance();
-                        if (m_hereDataSource != null) {
-                            pm = PositioningManager.getInstance();
-                            //pm.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-                            pm.setDataSource(m_hereDataSource);
-                            pm.addListener(new WeakReference<PositioningManager.OnPositionChangedListener>(Positioning.this));
-                            if (pm.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR)) {
-                                Log.e("poso", "position Update Started");
-                            } else {
-                                Log.e("positioning","failed");
-                            }
-                        }
-                    }
+                     if(error==Error.NONE) {
+                      Toast.makeText(m_activity,"Map initialized",Toast.LENGTH_LONG).show();
+                         m_hereDataSource = LocationDataSourceHERE.getInstance();
+                         if (m_hereDataSource != null) {
+                             pm = PositioningManager.getInstance();
+                             //pm.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
+                             pm.setDataSource(m_hereDataSource);
+                             pm.addListener(new WeakReference<PositioningManager.OnPositionChangedListener>(Positioning.this));
+                             if (pm.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR)) {
+                                 Log.e("poso", "position Update Started");
+                             } else {
+                                 Log.e("positioning", "failed");
+                             }
+                         }
+
+                     }
+                     else
+                     {
+                         Log.e("errro",error.getStackTrace());
+                     }
+                     }
                     });
                 }
         }
