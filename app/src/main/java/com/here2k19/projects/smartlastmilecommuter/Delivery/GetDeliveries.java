@@ -84,15 +84,17 @@ public class GetDeliveries extends AppCompatActivity  {
             @Override
             public void onClick(View v) {
 
-                Log.e("Loc",Positioning.latitude+","+Positioning.longitude);
-
-//                if(flag){
-//                    Intent intent = new Intent(GetDeliveries.this, MapActivity.class);
-//                    staticProducstsList = productList;
-//                    startActivity(intent);
-//                }else{
-//                    Toast.makeText(GetDeliveries.this, "No orders yet!", Toast.LENGTH_SHORT).show();
-//                }
+//                Log.e("Loc",Positioning.pm.getPosition().getCoordinate().toString());
+//                Log.e("Loc",Positioning.latitude+","+Positioning.longitude);
+//
+//                Toast.makeText(GetDeliveries.this, Positioning.latitude+","+Positioning.longitude, Toast.LENGTH_SHORT).show();
+                if(flag){
+                    Intent intent = new Intent(GetDeliveries.this, MapActivity.class);
+                    staticProducstsList = productList;
+                    startActivity(intent);
+                }else{
+                    Toast.makeText(GetDeliveries.this, "No orders yet!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

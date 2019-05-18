@@ -47,6 +47,7 @@ import com.here2k19.projects.smartlastmilecommuter.Geocoding.MainView;
 import com.here2k19.projects.smartlastmilecommuter.R;
 import com.here2k19.projects.smartlastmilecommuter.Routing.MapFragmentView1;
 import com.here2k19.projects.smartlastmilecommuter.Routing.Positioning;
+import com.here2k19.projects.smartlastmilecommuter.Routing.WaypointListener;
 import com.here2k19.projects.smartlastmilecommuter.Routing.Waypoints;
 
 import java.io.File;
@@ -110,12 +111,20 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
             @Override
             public void onClick(View v) {
                 getOrders();
-                if(orderlocation!=null)
-                {
+                if(orderlocation!=null){
                     Waypoints waypoints=new Waypoints();
-                    waypoints.getWaypoints(orderlocation,MapActivity.this);
-                }
+                    waypoints.getWaypoints(orderlocation, MapActivity.this, new WaypointListener() {
+                        @Override
+                        public void waypoints(List<GeoCoordinate> waypoints) {
+                            drawRouteForOrder(waypoints);
+                        }
 
+                        @Override
+                        public void waypointsError(String error) {
+                            Log.e("Error",error);
+                        }
+                    });
+                }
             }
         });
         appCompatActivity=new AppCompatActivity();
@@ -208,6 +217,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
                                 markers.add(new MapMarker(new GeoCoordinate(currentloclat, currentloclang)).setTitle("ahii").setDescription("dfdf"));
                                 markers.add(new MapMarker(new GeoCoordinate(adminloc.getLatitude(), adminloc.getLongitude())).setTitle(adminloc.getLatitude()+","+adminloc.getLongitude()));
                                 map.addMapObjects(markers);
+                                currentloc = new GeoCoordinate(currentloclat,currentloclang);
                                 map.setCenter(new GeoCoordinate(currentloclat, currentloclang, 0.0),
                                         Map.Animation.NONE);
                                 drawRoute(adminloc,currentloc);
@@ -231,7 +241,6 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
            String[] ordersLocation = subOrdersModel.getLocation().split(",");
            orderlocation.add(new GeoCoordinate(Double.parseDouble(ordersLocation[0]),Double.parseDouble(ordersLocation[1].trim())));
        }
-       drawRouteForOrder(orderlocation);
     }
     public  SupportMapFragment getMapFragment() {
     Log.e("cll","called");
@@ -275,6 +284,11 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
                         map.setZoomLevel(15);
                         currentloclat = Double.parseDouble(String.valueOf(Positioning.latitude));
                         currentloclang = Double.parseDouble(String.valueOf(Positioning.longitude));
+
+                        if(currentloclat == 0.0 || currentloclang ==0.0){
+                            currentloclat = 13.043228;
+                            currentloclang = 77.609438;
+                        }
                         Log.e("Current Location: ",currentloclat+","+currentloclang);
                         getAlert();
 
@@ -504,10 +518,9 @@ for(int i=0;i<listOfValues.size();i++)
         });
     }
 
-private void drawRouteForOrder(ArrayList<GeoCoordinate> arrayList)
+private void drawRouteForOrder(List<GeoCoordinate> arrayList)
 {
-    if(adminLocationRoute !=null)
-    {
+    if(adminLocationRoute !=null){
         map.removeMapObject(adminLocationRoute);
     }
     coreRouter=new CoreRouter();
@@ -520,9 +533,10 @@ private void drawRouteForOrder(ArrayList<GeoCoordinate> arrayList)
         lang=arrayList.get(i).getLongitude();
         mainView.triggerRevGeocodeRequest(lat,lang);
         ordersMarker=new MapMarker(new GeoCoordinate(arrayList.get(i))).setTitle(""+i);
-    //    Log.e("MapActRev",MainView.revvalue);
         map.addMapObject(ordersMarker);
     }
+
+    map.setCenter(arrayList.get(0), Map.Animation.LINEAR);
 
 
     RouteOptions routeOptions = new RouteOptions();

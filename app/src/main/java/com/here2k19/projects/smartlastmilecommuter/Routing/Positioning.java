@@ -1,6 +1,9 @@
 package com.here2k19.projects.smartlastmilecommuter.Routing;
 
 import android.app.Activity;
+import android.app.job.JobScheduler;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
@@ -15,12 +18,13 @@ import com.here2k19.projects.smartlastmilecommuter.Geocoding.MainView;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.Timer;
 
 public class Positioning implements PositioningManager.OnPositionChangedListener{
     private Activity m_activity;
     private LocationDataSourceHERE m_hereDataSource;
     public static double latitude,longitude;
-    private PositioningManager pm;
+    public static PositioningManager pm;
     private int count=0;
 
     public void getPos(Activity m_activity) {
@@ -49,6 +53,9 @@ public class Positioning implements PositioningManager.OnPositionChangedListener
                             } else {
                                 Log.e("positioning","failed");
                             }
+
+
+
                         }
                     }
                     });

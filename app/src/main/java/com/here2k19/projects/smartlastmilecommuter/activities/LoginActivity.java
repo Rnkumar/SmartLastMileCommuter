@@ -200,12 +200,12 @@ public class LoginActivity extends AppCompatActivity{
                                 map.put("VehicleType","Bike");
                                 map.put("driverId",user.getUid());
                                 map.put("inRide",false);
-                            Map<String,Double> liveLocation = new HashMap<>();
+                                Map<String,Double> liveLocation = new HashMap<>();
                                 liveLocation.put("latitude",Positioning.latitude);
                                 liveLocation.put("longitude",Positioning.longitude);
 
                             map.put("livelocation",liveLocation);
-                            databaseReference.setValue(map);
+                            databaseReference.updateChildren(map);
                             startActivity(new Intent(getApplicationContext(), GetDeliveries.class));
                         } else {
                             progressDialog.dismiss();
