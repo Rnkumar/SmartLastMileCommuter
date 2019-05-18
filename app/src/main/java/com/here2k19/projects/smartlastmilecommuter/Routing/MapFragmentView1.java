@@ -1,13 +1,6 @@
 package com.here2k19.projects.smartlastmilecommuter.Routing;
 
-import android.support.v7.app.AppCompatActivity;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.graphics.PointF;
-import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,11 +12,11 @@ import com.here.android.mpa.common.PositioningManager;
 import com.here.android.mpa.common.ViewObject;
 import com.here.android.mpa.guidance.NavigationManager;
 import com.here.android.mpa.mapping.Map;
-import com.here.android.mpa.mapping.SupportMapFragment;
 import com.here.android.mpa.mapping.MapGesture;
 import com.here.android.mpa.mapping.MapMarker;
 import com.here.android.mpa.mapping.MapState;
 import com.here.android.mpa.mapping.OnMapRenderListener;
+import com.here.android.mpa.mapping.SupportMapFragment;
 import com.here.android.mpa.routing.CoreRouter;
 import com.here.android.mpa.routing.Maneuver;
 import com.here.android.mpa.routing.Route;
@@ -39,12 +32,6 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
-/**
- * Besides the turn-by-turn navigation example app, This app covers 2 other common use cases:
- * - usage of MapUpdateMode#RoadView during navigation and its interactions with user gestures.
- * - using a MapMarker as position indicator and how to make the movements smooth and
- * synchronized with map movements.
- */
 public class MapFragmentView1 extends NavigationManager.NewInstructionEventListener {
     private SupportMapFragment m_mapFragment;
     private Map m_map;
@@ -85,8 +72,6 @@ NavigationManager navigationManager;
            String Traffic=""+maneuver.getTrafficDirection();
            textView.setText("Road Information  :"+roadInformation+
                    "\nNextManeuver Distance"+nextManeuver+"\nTurn"+turn+"\nTraffic :"+Traffic);
-            // display current or next road information
-            // display maneuver.getDistanceToNextManeuver()
         }
     }
 

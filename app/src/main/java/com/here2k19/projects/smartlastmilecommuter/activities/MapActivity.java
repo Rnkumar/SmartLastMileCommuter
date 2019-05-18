@@ -96,8 +96,9 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         checkPermissions();
+        adminloc=GetDeliveries.adminLoc;
         setupMapFragmentView();
-       // getAlert();
+        getAlert();
 
 
 
@@ -113,14 +114,14 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
                 getOrders();
                 if(orderlocation!=null)
                 {
-                    Waypoints waypoints=new Waypoints(MapActivity.this);
+                    Waypoints waypoints=new Waypoints();
                     waypoints.getWaypoints(orderlocation,MapActivity.this);
                 }
 
             }
         });
         appCompatActivity=new AppCompatActivity();
-        final GeoCoordinate admin_loc=GetDeliveries.adminLoc;
+
             Handler handler=new Handler();
             handler.postDelayed(new Runnable() {
                 @Override
@@ -142,7 +143,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
                        if(getalert) {
                            ArrayList<MapObject> markers = new ArrayList<MapObject>();
                            markers.add(new MapMarker(new GeoCoordinate(currentloclat, currentloclang)).setTitle("ahii").setDescription("dfdf"));
-                           markers.add(new MapMarker(new GeoCoordinate(adminlat, adminlang)).setTitle(admin_loc.getLatitude()+","+admin_loc.getLongitude()));
+                           markers.add(new MapMarker(new GeoCoordinate(adminlat, adminlang)).setTitle(adminloc.getLatitude()+","+adminloc.getLongitude()));
                            map.addMapObjects(markers);
 
                            map.setCenter(new GeoCoordinate(currentloclat, currentloclang, 0.0),
@@ -198,13 +199,10 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
                 .setPositiveButton("OK",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog,int id) {
-             if(value==true)
-             {
+             if(value){
                  vehicle="bike";
                  getalert=true;
-             }
-             else
-             {
+             }else{
                  vehicle="car";
              getalert=true;
              }
@@ -222,7 +220,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
 
     private void getOrders() {
        orderlocation= new ArrayList<>();
-       orderlocation.add(new GeoCoordinate(adminloc));
+       orderlocation.add(adminloc);
        for(SubOrdersModel subOrdersModel:productsList){
            String[] ordersLocation = subOrdersModel.getLocation().split(",");
            orderlocation.add(new GeoCoordinate(Double.parseDouble(ordersLocation[0]),Double.parseDouble(ordersLocation[1].trim())));
@@ -372,6 +370,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
             });
         }
     }
+
 /*public void nearby(GeoCoordinate first,ArrayList<GeoCoordinate> list)
 {
     Location location1,location2;
@@ -538,7 +537,7 @@ for(int i=0;i<arrayList.size();i++)
         public void onCalculateRouteFinished(List<RouteResult> routeResults, RoutingError routingError) {
             if (routingError == RoutingError.NONE) {
                 // Render the route on the map
- int duration=routeResults.get(0).getRoute().getTtaExcludingTraffic(Route.WHOLE_ROUTE).getDuration();
+                int duration=routeResults.get(0).getRoute().getTtaExcludingTraffic(Route.WHOLE_ROUTE).getDuration();
               int hours=duration/60;
               time.setText(hours+"min");
                if(hours<1)
@@ -555,9 +554,6 @@ for(int i=0;i<arrayList.size();i++)
         }
     });
 }
-    /**
-     * Checks the dynamically controlled permissions and requests missing permissions from end user.
-     */
     protected void checkPermissions() {
         final List<String> missingPermissions = new ArrayList<String>();
         // check all required dynamic permissions
@@ -612,7 +608,6 @@ for(int i=0;i<arrayList.size();i++)
     @Override
     public void onCalculateRouteFinished(List<RouteResult> list, RoutingError routingError) {
         if (routingError == RoutingError.NONE) {
-            // Render the route on the map
             MapRoute mapRoute = new MapRoute(list.get(0).getRoute());
             map.addMapObject(mapRoute);
         }

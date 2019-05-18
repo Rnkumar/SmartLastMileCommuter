@@ -30,7 +30,7 @@ public class SubOrdersAdapter extends RecyclerView.Adapter<SubOrdersAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         LayoutInflater inflater = LayoutInflater.from(mCtx);
-        View view = inflater.inflate(R.layout.item_order, null);
+        View view = inflater.inflate(R.layout.item_order, viewGroup,false);
         return new ViewHolder(view);
     }
 

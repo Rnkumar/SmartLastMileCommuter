@@ -203,7 +203,7 @@ MapMarker mapMarker,mapMarker1;
     }
 
     private void initNaviControlButton() {
-        m_naviControlButton = (Button) m_activity.findViewById(R.id.naviCtrlButton);
+        m_naviControlButton = m_activity.findViewById(R.id.naviCtrlButton);
         m_naviControlButton.setText(R.string.start_navi);
         m_naviControlButton.setOnClickListener(new View.OnClickListener() {
             @Override
