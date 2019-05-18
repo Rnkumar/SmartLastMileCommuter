@@ -1,9 +1,6 @@
 package com.here2k19.projects.smartlastmilecommuter.Routing;
 
 import android.app.Activity;
-import android.app.job.JobScheduler;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
@@ -18,13 +15,12 @@ import com.here2k19.projects.smartlastmilecommuter.Geocoding.MainView;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.Timer;
 
 public class Positioning implements PositioningManager.OnPositionChangedListener{
     private Activity m_activity;
     private LocationDataSourceHERE m_hereDataSource;
     public static double latitude,longitude;
-    public static PositioningManager pm;
+    private PositioningManager pm;
     private int count=0;
 
     public void getPos(Activity m_activity) {
@@ -42,22 +38,27 @@ public class Positioning implements PositioningManager.OnPositionChangedListener
                 MapEngine.getInstance().init(new ApplicationContext(m_activity.getApplicationContext()), new OnEngineInitListener() {
                     @Override
                     public void onEngineInitializationCompleted(Error error) {
-                        m_hereDataSource = LocationDataSourceHERE.getInstance();
-                        if (m_hereDataSource != null) {
-                            pm = PositioningManager.getInstance();
-                            //pm.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
-                            pm.setDataSource(m_hereDataSource);
-                            pm.addListener(new WeakReference<PositioningManager.OnPositionChangedListener>(Positioning.this));
-                            if (pm.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR)) {
-                                Log.e("poso", "position Update Started");
-                            } else {
-                                Log.e("positioning","failed");
-                            }
+                     if(error==Error.NONE) {
+                      Toast.makeText(m_activity,"Map initialized",Toast.LENGTH_LONG).show();
+                         m_hereDataSource = LocationDataSourceHERE.getInstance();
+                         if (m_hereDataSource != null) {
+                             pm = PositioningManager.getInstance();
+                             //pm.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR);
+                             pm.setDataSource(m_hereDataSource);
+                             pm.addListener(new WeakReference<PositioningManager.OnPositionChangedListener>(Positioning.this));
+                             if (pm.start(PositioningManager.LocationMethod.GPS_NETWORK_INDOOR)) {
+                                 Log.e("poso", "position Update Started");
+                             } else {
+                                 Log.e("positioning", "failed");
+                             }
+                         }
 
-
-
-                        }
-                    }
+                     }
+                     else
+                     {
+                         Log.e("errro",error.getStackTrace());
+                     }
+                     }
                     });
                 }
         }

@@ -43,7 +43,7 @@ public class GetDeliveries extends AppCompatActivity  {
 
     List<SubOrdersModel> productList;
     RecyclerView recyclerView;
-
+AppCompatActivity appCompatActivity;
     public static List<SubOrdersModel> staticProducstsList;
     public static GeoCoordinate adminLoc;
 
@@ -55,7 +55,7 @@ public class GetDeliveries extends AppCompatActivity  {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_get_deliveries);
-
+appCompatActivity=this;
         checkLocationServices();
 
         getSupportActionBar().setTitle(getString(R.string.orders));
@@ -83,11 +83,9 @@ public class GetDeliveries extends AppCompatActivity  {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-//                Log.e("Loc",Positioning.pm.getPosition().getCoordinate().toString());
-//                Log.e("Loc",Positioning.latitude+","+Positioning.longitude);
-//
-//                Toast.makeText(GetDeliveries.this, Positioning.latitude+","+Positioning.longitude, Toast.LENGTH_SHORT).show();
+         Positioning positioning=new Positioning();
+         positioning.getPos(GetDeliveries.this);
+                Log.e("Loc",Positioning.latitude+","+Positioning.longitude);
                 if(flag){
                     Intent intent = new Intent(GetDeliveries.this, MapActivity.class);
                     staticProducstsList = productList;
@@ -96,10 +94,11 @@ public class GetDeliveries extends AppCompatActivity  {
                     Toast.makeText(GetDeliveries.this, "No orders yet!", Toast.LENGTH_SHORT).show();
                 }
             }
+
         });
 
-        Positioning positioning=new Positioning();
-        positioning.getPos(GetDeliveries.this);
+//        Positioning positioning=new Positioning();
+//        positioning.getPos(GetDeliveries.this);
         recyclerView=findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
