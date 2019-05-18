@@ -19,7 +19,7 @@ import java.util.List;
 
 public class Waypoints {
   private static String response1="df";
-
+   public static List<GeoCoordinate> list;
   private WaypointListener waypointListener;
 
     public Waypoints(Context context) {
@@ -65,7 +65,7 @@ public class Waypoints {
             GeoCoordinate coordinate = latLngList.get(i);
             coordinates.append("destination").append(i).append("=").append(coordinate.getLatitude()).append(",").append(coordinate.getLongitude()).append("&");
         }
-        GeoCoordinate endCoordinate = latLngList.get(((latLngList.size())-1));
+     GeoCoordinate endCoordinate = latLngList.get(((latLngList.size())-1));
         String endUrl = "end="+endCoordinate.getLatitude()+","+endCoordinate.getLongitude();
         String extras="&mode=fastest;car&app_id="+app_id+"&app_code="+app_code;
         String url = baseUrl+startUrl+coordinates+endUrl+extras;
@@ -77,7 +77,7 @@ public class Waypoints {
                 Log.e("response",response.toString());
                 try {
                     JSONArray jsonArray = response.getJSONArray("results").getJSONObject(0).getJSONArray("waypoints");
-                    List<GeoCoordinate> list= new ArrayList<>();
+                    list= new ArrayList<>();
                     for(int i=0;i<jsonArray.length();i++){
                         JSONObject waypoint = jsonArray.getJSONObject(i);
                         GeoCoordinate geoCoordinate = new GeoCoordinate(waypoint.getDouble("lat"),waypoint.getDouble("lng"));
