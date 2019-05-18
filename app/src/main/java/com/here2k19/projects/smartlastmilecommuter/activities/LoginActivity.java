@@ -1,10 +1,15 @@
 package com.here2k19.projects.smartlastmilecommuter.activities;
 
+import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputEditText;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -37,6 +42,15 @@ import java.util.concurrent.TimeUnit;
 
 public class LoginActivity extends AppCompatActivity{
 
+    private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
+    private static final String[] RUNTIME_PERMISSIONS = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.INTERNET,
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.ACCESS_NETWORK_STATE
+    };
+
     private static final String TAG = "Login Activity";
     private TextInputEditText loginPhoneNumberEditText;
     private String mVerificationId;
@@ -49,6 +63,55 @@ public class LoginActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (hasPermissions(this, RUNTIME_PERMISSIONS)) {
+            setUpView();
+        } else {
+            ActivityCompat
+                    .requestPermissions(this, RUNTIME_PERMISSIONS, REQUEST_CODE_ASK_PERMISSIONS);
+        }
+    }
+
+    private static boolean hasPermissions(Context context, String... permissions) {
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && permissions != null) {
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(context, permission)
+                        != PackageManager.PERMISSION_GRANTED) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS: {
+                for (int index = 0; index < permissions.length; index++) {
+                    if (grantResults[index] != PackageManager.PERMISSION_GRANTED) {
+                        if (!ActivityCompat
+                                .shouldShowRequestPermissionRationale(this, permissions[index]))
+                            Toast.makeText(this, "Required permission " + permissions[index]
+                                            + " not granted. "
+                                            + "Please go to settings and turn on for sample app",
+                                    Toast.LENGTH_LONG).show();
+                        else {
+                            Toast.makeText(this, "Required permission " + permissions[index]
+                                    + " not granted", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                }
+
+                setUpView();
+                break;
+            }
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    private void setUpView() {
         setContentView(R.layout.activity_login);
         loginPhoneNumberEditText= findViewById(R.id.login_mobile_number);
         editText=findViewById(R.id.usrname);
@@ -143,7 +206,6 @@ public class LoginActivity extends AppCompatActivity{
 
                             map.put("livelocation",liveLocation);
                             databaseReference.setValue(map);
-                            positioning.stopPositioning();
                             startActivity(new Intent(getApplicationContext(), GetDeliveries.class));
                         } else {
                             progressDialog.dismiss();

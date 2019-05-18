@@ -12,4 +12,5 @@
     <string name="orders">Orders</string>
     <string name="no_orders_assigned_yet">No Orders Assigned Yet</string>
     <string name="logout">Logout</string>
+    <string name="open_location_settings">Settings</string>
 </resources>

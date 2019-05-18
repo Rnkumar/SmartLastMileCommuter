@@ -1,10 +1,16 @@
 package com.here2k19.projects.smartlastmilecommuter.Delivery;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -50,6 +56,8 @@ public class GetDeliveries extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_get_deliveries);
 
+        checkLocationServices();
+
         getSupportActionBar().setTitle(getString(R.string.orders));
         DatabaseReference reference = FirebaseDatabase.getInstance().getReference("admin").child("xxx").child("location");
         reference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -78,13 +86,13 @@ public class GetDeliveries extends AppCompatActivity  {
 
                 Log.e("Loc",Positioning.latitude+","+Positioning.longitude);
 
-                if(flag){
-                    Intent intent = new Intent(GetDeliveries.this, MapActivity.class);
-                    staticProducstsList = productList;
-                    startActivity(intent);
-                }else{
-                    Toast.makeText(GetDeliveries.this, "No orders yet!", Toast.LENGTH_SHORT).show();
-                }
+//                if(flag){
+//                    Intent intent = new Intent(GetDeliveries.this, MapActivity.class);
+//                    staticProducstsList = productList;
+//                    startActivity(intent);
+//                }else{
+//                    Toast.makeText(GetDeliveries.this, "No orders yet!", Toast.LENGTH_SHORT).show();
+//                }
             }
         });
 
@@ -147,5 +155,51 @@ public class GetDeliveries extends AppCompatActivity  {
             startActivity(new Intent(GetDeliveries.this, LoginActivity.class));
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void checkLocationServices(){
+        LocationManager lm = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch(Exception ex) {}
+
+        try {
+            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch(Exception ex) {}
+
+        if(!gps_enabled || !network_enabled) {
+            // notify user
+            AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+            dialog.setMessage("GPS not enabled");
+            dialog.setPositiveButton(getResources().getString(R.string.open_location_settings), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                    // TODO Auto-generated method stub
+                    Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(myIntent);
+                    //get gps
+                }
+            });
+            dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                    // TODO Auto-generated method stub
+                    Toast.makeText(GetDeliveries.this, "Enable Location Services", Toast.LENGTH_SHORT).show();
+                }
+            });
+            final AlertDialog d =  dialog.create();
+            d.setOnShowListener(new DialogInterface.OnShowListener() {
+                @Override
+                public void onShow(DialogInterface dialog) {
+                    d.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.BLACK);
+                    d.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.BLACK);
+                }
+            });
+            d.show();
+        }
     }
 }
