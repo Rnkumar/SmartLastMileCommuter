@@ -21,3 +21,5 @@
     12. Then click on the start button.
     13. Simulation of route through all the waypoints(users) is displayed.
     14. In the orders screen, there is a logout option.
+
+### This link has the apk - https://drive.google.com/open?id=1N_d9XWxo0-m7B3IWl0PyVFSOA9S4257Z
