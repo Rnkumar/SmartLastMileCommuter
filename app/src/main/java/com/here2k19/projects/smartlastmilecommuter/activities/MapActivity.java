@@ -39,6 +39,7 @@ import com.here.android.mpa.routing.Route;
 import com.here.android.mpa.routing.RouteOptions;
 import com.here.android.mpa.routing.RoutePlan;
 import com.here.android.mpa.routing.RouteResult;
+import com.here.android.mpa.routing.RouteTta;
 import com.here.android.mpa.routing.RouteWaypoint;
 import com.here.android.mpa.routing.Router;
 import com.here.android.mpa.routing.RoutingError;
@@ -124,6 +125,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
                     waypoints.getWaypoints(orderlocation, MapActivity.this, new WaypointListener() {
                         @Override
                         public void waypoints(List<GeoCoordinate> waypoints) {
+                            orderlist = orderlocation;
                             drawRouteForOrder(waypoints);
                         }
 
@@ -512,13 +514,10 @@ for(int i=0;i<listOfValues.size();i++)
             public void onCalculateRouteFinished(List<RouteResult> routeResults, RoutingError routingError) {
                 if (routingError == RoutingError.NONE) {
                     // Render the route on the map
-                    int duration=routeResults.get(0).getRoute().getTtaExcludingTraffic(Route.WHOLE_ROUTE).getDuration();
-                    int hours=duration/60;
-                    time.setText(hours+"min");
-                    if(hours<1)
-                    {
-                        time.setText(duration+"min");
-                    }
+                    RouteTta tt = routeResults.get(0).getRoute().getTta(Route.TrafficPenaltyMode.OPTIMAL,routeResults.get(0).getRoute().getSublegCount()>0&&routeResults.get(0).getRoute().getSublegCount()!=1?1:0);
+                    long timeInSeconds = tt.getDuration();
+                    long timeInMinutes = timeInSeconds/60;
+                    time.append(timeInMinutes+"mins"+"\n");
 
                     adminLocationRoute = new MapRoute(routeResults.get(0).getRoute());
                     map.addMapObject(adminLocationRoute);

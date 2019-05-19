@@ -18,6 +18,7 @@ import com.here.android.mpa.routing.Route;
 import com.here.android.mpa.routing.RouteOptions;
 import com.here.android.mpa.routing.RoutePlan;
 import com.here.android.mpa.routing.RouteResult;
+import com.here.android.mpa.routing.RouteTta;
 import com.here.android.mpa.routing.RouteWaypoint;
 import com.here.android.mpa.routing.Router;
 import com.here.android.mpa.routing.RoutingError;
@@ -54,7 +55,7 @@ import android.widget.Toast;
 public class MapFragmentView{
     private SupportMapFragment m_mapFragment;
     private MapActivity m_activity;
-    TextView textView;
+    TextView textView,estimatedTime;
     private Button m_naviControlButton;
     private Map m_map;
     private NavigationManager m_navigationManager;
@@ -76,6 +77,7 @@ public class MapFragmentView{
         /* Locate the mapFragment UI element */
         m_mapFragment = getMapFragment();
 
+        estimatedTime = m_activity.findViewById(R.id.tim);
         textView = m_activity.findViewById(R.id.maneveur);
         boolean success = com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(
                 m_activity.getExternalFilesDir(null) + File.separator + ".here-maps",
@@ -172,6 +174,11 @@ public class MapFragmentView{
 
                                 /* Show the maneuver number on top of the route */
                                 mapRoute.setManeuverNumberVisible(true);
+
+                                RouteTta tt = m_route.getTta(Route.TrafficPenaltyMode.OPTIMAL,m_route.getSublegCount()>0&&m_route.getSublegCount()!=1?1:0);
+                                long timeInSeconds = tt.getDuration();
+                                long timeInMinutes = timeInSeconds/60;
+                                estimatedTime.append(timeInMinutes+"mins"+"\n");
 
                                 /* Add the MapRoute to the map */
                                 m_map.addMapObject(mapRoute);

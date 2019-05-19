@@ -31,7 +31,7 @@
                 android:id="@+id/maneveur"
                 android:layout_width="match_parent"
                 android:textColor="#cf1020"
-                android:textSize="10sp"
+                android:textSize="14sp"
                 android:layout_alignParentLeft="true"
                 android:layout_height="wrap_content" />
             <Button
@@ -61,10 +61,14 @@
                 android:layout_toEndOf="@id/naviCtrlButton"
                 android:layout_marginStart="5dp" />
             <TextView
+                android:layout_marginLeft="10dp"
                 android:id="@+id/tim"
+                android:textStyle="bold"
                 android:layout_alignParentRight="true"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_alignParentEnd="true" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 </RelativeLayout>

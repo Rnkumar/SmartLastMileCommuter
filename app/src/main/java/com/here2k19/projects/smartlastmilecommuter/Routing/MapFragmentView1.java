@@ -24,6 +24,7 @@ import com.here.android.mpa.routing.Route;
 import com.here.android.mpa.routing.RouteOptions;
 import com.here.android.mpa.routing.RoutePlan;
 import com.here.android.mpa.routing.RouteResult;
+import com.here.android.mpa.routing.RouteTta;
 import com.here.android.mpa.routing.RouteWaypoint;
 import com.here.android.mpa.routing.RoutingError;
 import com.here2k19.projects.smartlastmilecommuter.R;
@@ -38,13 +39,13 @@ import java.util.List;
 public class MapFragmentView1 extends NavigationManager.NewInstructionEventListener {
     private SupportMapFragment m_mapFragment;
     private Map m_map;
-NavigationManager navigationManager;
+    NavigationManager navigationManager;
     private MapMarker m_positionIndicatorFixed = null;
     private PointF m_mapTransformCenter;
     private boolean m_returningToRoadViewMode = false;
     private double m_lastZoomLevelInRoadViewMode = 0.0;
     private MapActivity m_activity;
-List<GeoCoordinate> list;
+    List<GeoCoordinate> list;
     public MapFragmentView1(MapActivity activity) {
         m_activity = activity;
         initMapFragment();
@@ -60,7 +61,7 @@ List<GeoCoordinate> list;
 
     @Override
     public void onNewInstructionEvent() {
-        //super.onNewInstructionEvent();
+        super.onNewInstructionEvent();
         navigationManager=NavigationManager.getInstance();
         Maneuver maneuver = navigationManager.getNextManeuver();
         if (maneuver != null) {
@@ -69,18 +70,12 @@ List<GeoCoordinate> list;
             Toast.makeText(m_activity,"Route is complete",Toast.LENGTH_LONG);
             }
             TextView textView=m_activity.findViewById(R.id.maneveur);
-            //String roadInformation=maneuver.getRoadName();
-            //String nextManeuver=""+maneuver.getDistanceToNextManeuver();
-//            String turn=""+maneuver.getTurn();
-//           String Traffic=""+maneuver.getTrafficDirection();
             Maneuver.Turn turn = maneuver.getTurn();
             String turnName=turn.name();
             int distance = maneuver.getDistanceFromPreviousManeuver();
             String nextRoadName = maneuver.getNextRoadName();
-
-            String data = turnName + "\n"+ distance;
-//           textView.setText("Road Information  :"+roadInformation+
-//                   "\nNextManeuver Distance"+nextManeuver+"\nTurn"+turn+"\nTraffic :"+Traffic);
+            String data = "Take a "+turnName+" in "+distance+"mts"+" to "+ nextRoadName;
+            textView.setText(data);
         }
     }
 
@@ -146,6 +141,11 @@ List<GeoCoordinate> list;
                                                                          RoutingError routingError) {
                                         if (routingError == RoutingError.NONE) {
                                             Route route = list.get(0).getRoute();
+                                            RouteTta tt = route.getTta(Route.TrafficPenaltyMode.OPTIMAL,route.getSublegCount()>0&&route.getSublegCount()!=1?1:0);
+                                            long timeInSeconds = tt.getDuration();
+                                            long timeInMinutes = timeInSeconds/60;
+                                            TextView textView = m_activity.findViewById(R.id.tim);
+                                            textView.append(timeInMinutes+"mins"+"\n");
 
                                             // move the map to the first waypoint which is starting point of
                                             // the route
