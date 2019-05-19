@@ -1,6 +1,7 @@
 package com.here2k19.projects.smartlastmilecommuter.Routing;
 
 import android.graphics.PointF;
+import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +21,7 @@ import com.here.android.mpa.mapping.SupportMapFragment;
 import com.here.android.mpa.routing.CoreRouter;
 import com.here.android.mpa.routing.Maneuver;
 import com.here.android.mpa.routing.Route;
+import com.here.android.mpa.routing.RouteOptions;
 import com.here.android.mpa.routing.RoutePlan;
 import com.here.android.mpa.routing.RouteResult;
 import com.here.android.mpa.routing.RouteWaypoint;
@@ -30,6 +32,7 @@ import com.here2k19.projects.smartlastmilecommuter.activities.MapActivity;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapFragmentView1 extends NavigationManager.NewInstructionEventListener {
@@ -41,7 +44,7 @@ NavigationManager navigationManager;
     private boolean m_returningToRoadViewMode = false;
     private double m_lastZoomLevelInRoadViewMode = 0.0;
     private MapActivity m_activity;
-
+List<GeoCoordinate> list;
     public MapFragmentView1(MapActivity activity) {
         m_activity = activity;
         initMapFragment();
@@ -100,13 +103,33 @@ NavigationManager navigationManager;
                             m_map = m_mapFragment.getMap();
                             m_map.setZoomLevel(19);
                             m_map.addTransformListener(onTransformListener);
-
+list=new ArrayList<GeoCoordinate>();
+             list=MapActivity.orderlist;
                             PositioningManager.getInstance().start(PositioningManager.LocationMethod.GPS_NETWORK);
-                            final RoutePlan routePlan = new RoutePlan();
 
+                            final RoutePlan routePlan = new RoutePlan();
+int listsize=(list.size())-1;
+Log.e("Size",""+listsize);
+                     //       GeoCoordinate final=new GeoCoordinate(list.get());
                             // these two waypoints cover suburban roads
-                            routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(Positioning.latitude,Positioning.longitude)));
-                            routePlan.addWaypoint(new RouteWaypoint(MapActivity.adminloc));
+              for(int i=0;i<listsize;i++)
+              {
+                  routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(list.get(i).getLatitude(),list.get(i).getLongitude())));
+              }
+                            RouteOptions routeOptions = new RouteOptions();
+                            if(MapActivity.vehicle.equals("bike")) {
+                                routeOptions.setTransportMode(RouteOptions.TransportMode.SCOOTER);
+                                routeOptions.setRouteType(RouteOptions.Type.FASTEST);
+                                routePlan.setRouteOptions(routeOptions);
+                            }
+                            else
+                            {
+                                routeOptions.setTransportMode(RouteOptions.TransportMode.CAR);
+                                routeOptions.setRouteType(RouteOptions.Type.FASTEST);
+                                routePlan.setRouteOptions(routeOptions);
+                            }
+//                            routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(MapActivity.adminloc)));
+//                            routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(list.get(listsize).getLatitude(),list.get(listsize).getLongitude())));
 
                             try {
                                 // calculate a route for navigation

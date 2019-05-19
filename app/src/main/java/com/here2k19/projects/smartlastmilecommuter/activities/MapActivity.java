@@ -83,6 +83,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
     ArrayList<GeoCoordinate> listOfValues;
     ArrayList<GeoCoordinate> orderlocation;
     private MapMarker ordersMarker;
+    public static List<GeoCoordinate> orderlist;
     private MapFragmentView m_mapFragmentView;
     Button bt;
     TextView time;
@@ -530,6 +531,7 @@ private void drawRouteForOrder(List<GeoCoordinate> arrayList)
     if(adminLocationRoute !=null){
         map.removeMapObject(adminLocationRoute);
     }
+ orderlist=arrayList;
     coreRouter=new CoreRouter();
     RoutePlan routePlan=new RoutePlan();
     MainView mainView=new MainView(this);
