@@ -13,6 +13,7 @@ import com.here.android.mpa.mapping.MapMarker;
 import com.here.android.mpa.mapping.SupportMapFragment;
 import com.here.android.mpa.mapping.MapRoute;
 import com.here.android.mpa.routing.CoreRouter;
+import com.here.android.mpa.routing.Maneuver;
 import com.here.android.mpa.routing.Route;
 import com.here.android.mpa.routing.RouteOptions;
 import com.here.android.mpa.routing.RoutePlan;
@@ -50,20 +51,21 @@ import android.widget.Toast;
  * bundled within the SDK package to be used out-of-box, please refer to the Developer's guide for
  * the usage.
  */
-public class MapFragmentView {
+public class MapFragmentView{
     private SupportMapFragment m_mapFragment;
     private MapActivity m_activity;
+    TextView textView;
     private Button m_naviControlButton;
     private Map m_map;
     private NavigationManager m_navigationManager;
     private GeoBoundingBox m_geoBoundingBox;
     private Route m_route;
     private boolean m_foregroundServiceStarted;
-MapMarker mapMarker,mapMarker1;
+    MapMarker mapMarker,mapMarker1;
     public MapFragmentView(MapActivity activity) {
         m_activity = activity;
         initMapFragment();
-        initNaviControlButton();
+        //initNaviControlButton();
     }
 
     private SupportMapFragment getMapFragment() {
@@ -73,6 +75,8 @@ MapMarker mapMarker,mapMarker1;
     private void initMapFragment() {
         /* Locate the mapFragment UI element */
         m_mapFragment = getMapFragment();
+
+        textView = m_activity.findViewById(R.id.maneveur);
         boolean success = com.here.android.mpa.common.MapSettings.setIsolatedDiskCacheRootPath(
                 m_activity.getExternalFilesDir(null) + File.separator + ".here-maps",
                 "com.here2k19.projects.smartlastmilecommuter.MapService");        if (!success) {
@@ -110,7 +114,7 @@ MapMarker mapMarker,mapMarker1;
         }
     }
 
-    private void createRoute() {
+    private void createRoute(GeoCoordinate start, GeoCoordinate end) {
         /* Initialize a CoreRouter */
         CoreRouter coreRouter = new CoreRouter();
 
@@ -136,9 +140,9 @@ MapMarker mapMarker,mapMarker1;
 
         /* Define waypoints for the route */
         /* START: 4350 Still Creek Dr */
-        RouteWaypoint startPoint = new RouteWaypoint(new GeoCoordinate(49.259149, -123.008555));
+        RouteWaypoint startPoint = new RouteWaypoint(start);
         /* END: Langley BC */
-        RouteWaypoint destination = new RouteWaypoint(new GeoCoordinate(49.073640, -122.559549));
+        RouteWaypoint destination = new RouteWaypoint(end);
 
         /* Add both waypoints to the route plan */
         routePlan.addWaypoint(startPoint);
@@ -161,14 +165,8 @@ MapMarker mapMarker,mapMarker1;
                             if (routeResults.get(0).getRoute() != null) {
 
                                 m_route = routeResults.get(0).getRoute();
-                             int manuesrs=routeResults.size();
-                             Log.e("mann",""+manuesrs);
-      String roadname=routeResults.get(0).getRoute().getManeuvers().get(0).getRoadName();
-      String turns=""+routeResults.get(0).getRoute().getManeuvers().get(0).getTurn();
-
-                                TextView textView=m_activity.findViewById(R.id.maneveur);
-                                textView.setText("NextRoadName"+routeResults.get(0).getRoute().getManeuvers().get(0).getNextRoadName().toString()
-                                +"\n"+"NextRoad"+routeResults.get(0).getRoute().getManeuvers().get(0).getNextRoadNumber());
+                                //                                textView.setText("NextRoadName"+routeResults.get(0).getRoute().getManeuvers().get(0).getNextRoadName().toString()
+//                                +"\n"+"NextRoad"+routeResults.get(0).getRoute().getManeuvers().get(0).getNextRoadNumber());
                                 /* Create a MapRoute so that it can be placed on the map */
                                 MapRoute mapRoute = new MapRoute(routeResults.get(0).getRoute());
 
@@ -202,7 +200,7 @@ MapMarker mapMarker,mapMarker1;
                 });
     }
 
-    private void initNaviControlButton() {
+    public void initNaviControlButton(final GeoCoordinate start, final GeoCoordinate end) {
         m_naviControlButton = m_activity.findViewById(R.id.naviCtrlButton);
         m_naviControlButton.setText(R.string.start_navi);
         m_naviControlButton.setOnClickListener(new View.OnClickListener() {
@@ -210,7 +208,7 @@ MapMarker mapMarker,mapMarker1;
 
             public void onClick(View v) {
                 if (m_route == null) {
-                    createRoute();
+                    createRoute(start, end);
                 } else {
                     m_navigationManager.stop();
                     /*
@@ -309,12 +307,14 @@ MapMarker mapMarker,mapMarker1;
          * NavigationManager
          */
         m_navigationManager.addNavigationManagerEventListener(
-                new WeakReference<NavigationManager.NavigationManagerEventListener>(
+                new WeakReference<>(
                         m_navigationManagerEventListener));
 
         /* Register a PositionListener to monitor the position updates */
         m_navigationManager.addPositionListener(
-                new WeakReference<NavigationManager.PositionListener>(m_positionListener));
+                new WeakReference<>(m_positionListener));
+
+        m_navigationManager.addNewInstructionEventListener(new WeakReference<>(newInstructionEventListener));
 
     }
 
@@ -325,40 +325,53 @@ MapMarker mapMarker,mapMarker1;
         }
     };
 
+
+    private NavigationManager.NewInstructionEventListener newInstructionEventListener = new NavigationManager.NewInstructionEventListener() {
+        @Override
+        public void onNewInstructionEvent() {
+            super.onNewInstructionEvent();
+            Maneuver maneuver= m_navigationManager.getNextManeuver();
+            Maneuver.Turn turn = maneuver.getTurn();
+            String turnName=turn.name();
+            int distance = maneuver.getDistanceFromPreviousManeuver();
+            String nextRoadName = maneuver.getNextRoadName();
+            String data = "Take a "+turnName+" in "+distance+"mts"+" to "+ nextRoadName;
+            textView.setText(data);
+        }
+    };
+
     private NavigationManager.NavigationManagerEventListener m_navigationManagerEventListener = new NavigationManager.NavigationManagerEventListener() {
         @Override
         public void onRunningStateChanged() {
-            Toast.makeText(m_activity, "Running state changed", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(m_activity, "Running state changed", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onNavigationModeChanged() {
-            Toast.makeText(m_activity, "Navigation mode changed", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(m_activity, "Navigation mode changed", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onEnded(NavigationManager.NavigationMode navigationMode) {
-            Toast.makeText(m_activity, navigationMode + " was ended", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(m_activity, navigationMode + " was ended", Toast.LENGTH_SHORT).show();
             stopForegroundService();
         }
 
         @Override
         public void onMapUpdateModeChanged(NavigationManager.MapUpdateMode mapUpdateMode) {
-            Toast.makeText(m_activity, "Map update mode is changed to " + mapUpdateMode,
-                    Toast.LENGTH_SHORT).show();
+            //Toast.makeText(m_activity, "Map update mode is changed to " + mapUpdateMode,Toast.LENGTH_SHORT).show();
 
         }
 
         @Override
         public void onRouteUpdated(Route route) {
-            Toast.makeText(m_activity, "Route updated", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(m_activity, "Route updated", Toast.LENGTH_SHORT).show();
 
         }
 
         @Override
         public void onCountryInfo(String s, String s1) {
-            Toast.makeText(m_activity, "Country info updated from " + s + " to " + s1,
-                    Toast.LENGTH_SHORT).show();
+            //Toast.makeText(m_activity, "Country info updated from " + s + " to " + s1,Toast.LENGTH_SHORT).show();
         }
     };
 

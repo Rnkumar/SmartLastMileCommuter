@@ -55,7 +55,9 @@ AppCompatActivity appCompatActivity;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_get_deliveries);
-appCompatActivity=this;
+        Positioning positioning=new Positioning();
+        positioning.getPos(GetDeliveries.this);
+        appCompatActivity=this;
         checkLocationServices();
 
         getSupportActionBar().setTitle(getString(R.string.orders));
@@ -83,8 +85,6 @@ appCompatActivity=this;
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-         Positioning positioning=new Positioning();
-         positioning.getPos(GetDeliveries.this);
                 Log.e("Loc",Positioning.latitude+","+Positioning.longitude);
                 if(flag){
                     Intent intent = new Intent(GetDeliveries.this, MapActivity.class);

@@ -207,8 +207,16 @@ public class LoginActivity extends AppCompatActivity{
                                 editor.putString("mobile",mobile);
                                 editor.apply();
                                 Map<String,Double> liveLocation = new HashMap<>();
-                                liveLocation.put("latitude",Positioning.latitude);
-                                liveLocation.put("longitude",Positioning.longitude);
+
+                            double currentloclat = Double.parseDouble(String.valueOf(Positioning.latitude));
+                            double currentloclang = Double.parseDouble(String.valueOf(Positioning.longitude));
+
+                            if(currentloclat == 0.0 || currentloclang ==0.0){
+                                currentloclat = 13.043228;
+                                currentloclang = 77.609438;
+                            }
+                                liveLocation.put("latitude",currentloclat);
+                                liveLocation.put("longitude",currentloclang);
 
                             map.put("livelocation",liveLocation);
                             databaseReference.updateChildren(map);

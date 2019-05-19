@@ -129,7 +129,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
 
                         @Override
                         public void waypointsError(String error) {
-                            Log.e("Error",error);
+                            Log.e("Error","Error:"+error);
                         }
                     });
                 }
@@ -247,6 +247,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
        orderlocation.add(adminloc);
        for(SubOrdersModel subOrdersModel:productsList){
            String[] ordersLocation = subOrdersModel.getLocation().split(",");
+           Log.e("Orders",subOrdersModel.getLocation());
            orderlocation.add(new GeoCoordinate(Double.parseDouble(ordersLocation[0]),Double.parseDouble(ordersLocation[1].trim())));
        }
     }
@@ -481,6 +482,10 @@ for(int i=0;i<listOfValues.size();i++)
 
 
     private void drawRoute(GeoCoordinate adminloc, GeoCoordinate currentloc) {
+
+        m_mapFragmentView.initNaviControlButton(currentloc,adminloc);
+
+        if(2==2)return;
         coreRouter=new CoreRouter();
         RoutePlan routePlan=new RoutePlan();
         routePlan.addWaypoint(new RouteWaypoint(adminloc));
@@ -531,17 +536,20 @@ private void drawRouteForOrder(List<GeoCoordinate> arrayList)
     if(adminLocationRoute !=null){
         map.removeMapObject(adminLocationRoute);
     }
- orderlist=arrayList;
+    orderlist=arrayList;
     coreRouter=new CoreRouter();
     RoutePlan routePlan=new RoutePlan();
     MainView mainView=new MainView(this);
     double lat,lang;
+
+    Log.e("Coordinates::",arrayList.toString());
+
     for(int i=0;i<arrayList.size();i++) {
-        routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(arrayList.get(i))));
+        routePlan.addWaypoint(new RouteWaypoint(arrayList.get(i)));
         lat=arrayList.get(i).getLatitude();
         lang=arrayList.get(i).getLongitude();
         mainView.triggerRevGeocodeRequest(lat,lang);
-        ordersMarker=new MapMarker(new GeoCoordinate(arrayList.get(i))).setTitle(""+i);
+        ordersMarker=new MapMarker(arrayList.get(i)).setTitle(""+i);
         map.addMapObject(ordersMarker);
     }
 
@@ -578,10 +586,10 @@ private void drawRouteForOrder(List<GeoCoordinate> arrayList)
                    time.setText(duration+"min");
                }
                 ordersRoute = new MapRoute(routeResults.get(0).getRoute());
+                Log.e("orders:",ordersRoute.getRoute().getWaypoints().toString());
                 map.addMapObject(ordersRoute);
 
-            }
-            else {
+            }else {
                 // Display a message indicating route calculation failure
             }
         }

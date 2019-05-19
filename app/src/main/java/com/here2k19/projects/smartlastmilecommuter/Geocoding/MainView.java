@@ -199,7 +199,7 @@ progressDialog.dismiss();
         });
     }
 
-    public void triggerRevGeocodeRequest(double lat,double lang) {
+    public void triggerRevGeocodeRequest(final double lat, final double lang) {
      //   m_resultTextView.setText("");
         /* Create a ReverseGeocodeRequest object with a GeoCoordinate. */
         Log.e("call","called");
@@ -209,10 +209,8 @@ progressDialog.dismiss();
             @Override
             public void onCompleted(Location location, ErrorCode errorCode) {
                 if (errorCode == ErrorCode.NONE) {
-//if(revvalue!=null)
-
-                    //revvalue=location.getAddress().getDistrict();
-revvalue=location.getAddress().getText();
+                revvalue=location.getAddress().getText();
+                Log.e("Kist",lat+","+lang);
                 Log.e("district",location.getAddress().getDistrict());
                 Log.e("address",location.getAddress().getText());
                 //if(mapAct!=true) {

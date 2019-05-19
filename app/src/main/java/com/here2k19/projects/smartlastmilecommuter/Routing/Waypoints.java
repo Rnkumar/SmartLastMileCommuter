@@ -1,6 +1,8 @@
 package com.here2k19.projects.smartlastmilecommuter.Routing;
 import android.content.Context;
 import android.util.Log;
+
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -65,7 +67,7 @@ public class Waypoints {
             GeoCoordinate coordinate = latLngList.get(i);
             coordinates.append("destination").append(i).append("=").append(coordinate.getLatitude()).append(",").append(coordinate.getLongitude()).append("&");
         }
-     GeoCoordinate endCoordinate = latLngList.get(((latLngList.size())-1));
+        GeoCoordinate endCoordinate = latLngList.get(latLngList.size()-1);
         String endUrl = "end="+endCoordinate.getLatitude()+","+endCoordinate.getLongitude();
         String extras="&mode=fastest;car&app_id="+app_id+"&app_code="+app_code;
         String url = baseUrl+startUrl+coordinates+endUrl+extras;
@@ -92,9 +94,10 @@ public class Waypoints {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("err",""+error);
-                waypointListener.waypointsError(error.getMessage());
+                waypointListener.waypointsError(error+"");
             }
         });
+        jsonArrayRequest.setRetryPolicy(new DefaultRetryPolicy(10000,0,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(jsonArrayRequest);
     }
 }

@@ -38,11 +38,11 @@ public class SubOrdersAdapter extends RecyclerView.Adapter<SubOrdersAdapter.View
     public void onBindViewHolder(@NonNull final ViewHolder viewHolder, int i) {
         SubOrdersModel ordersModel=productList.get(i);
 
-        viewHolder.orderId.setText(String.format("%s%s", viewHolder.orderId.getText().toString(), ordersModel.getOrderId()));
-        viewHolder.quantity.setText(String.format("%s%s", viewHolder.quantity.getText().toString(), String.valueOf(ordersModel.getQuantity())));
-        viewHolder.deliveryLocation.setText(String.format("%s%s", viewHolder.deliveryLocation.getText(), ordersModel.getAddress()));
-        viewHolder.mobile.setText(String.format("%s%s",viewHolder.mobile.getText(),ordersModel.getMobile()));
-        viewHolder.name.setText(String.format("%s%s", viewHolder.name.getText().toString(), ordersModel.getItemName()));
+        viewHolder.orderId.setText(String.format("%s%s", "OrderId: ", ordersModel.getOrderId()));
+        viewHolder.quantity.setText(String.format("%s%s", "Quantity: ", String.valueOf(ordersModel.getQuantity())));
+        viewHolder.deliveryLocation.setText(String.format("%s%s", "Location: ", ordersModel.getAddress()));
+        viewHolder.mobile.setText(String.format("%s%s","Mobile: ",ordersModel.getMobile()));
+        viewHolder.name.setText(String.format("%s%s", "Name: ", ordersModel.getItemName()));
 
     }
 

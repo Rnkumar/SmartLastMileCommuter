@@ -69,12 +69,18 @@ List<GeoCoordinate> list;
             Toast.makeText(m_activity,"Route is complete",Toast.LENGTH_LONG);
             }
             TextView textView=m_activity.findViewById(R.id.maneveur);
-            String roadInformation=maneuver.getRoadName();
-            String nextManeuver=""+maneuver.getDistanceToNextManeuver();
-            String turn=""+maneuver.getTurn();
-           String Traffic=""+maneuver.getTrafficDirection();
-           textView.setText("Road Information  :"+roadInformation+
-                   "\nNextManeuver Distance"+nextManeuver+"\nTurn"+turn+"\nTraffic :"+Traffic);
+            //String roadInformation=maneuver.getRoadName();
+            //String nextManeuver=""+maneuver.getDistanceToNextManeuver();
+//            String turn=""+maneuver.getTurn();
+//           String Traffic=""+maneuver.getTrafficDirection();
+            Maneuver.Turn turn = maneuver.getTurn();
+            String turnName=turn.name();
+            int distance = maneuver.getDistanceFromPreviousManeuver();
+            String nextRoadName = maneuver.getNextRoadName();
+
+            String data = turnName + "\n"+ distance;
+//           textView.setText("Road Information  :"+roadInformation+
+//                   "\nNextManeuver Distance"+nextManeuver+"\nTurn"+turn+"\nTraffic :"+Traffic);
         }
     }
 
@@ -103,19 +109,19 @@ List<GeoCoordinate> list;
                             m_map = m_mapFragment.getMap();
                             m_map.setZoomLevel(19);
                             m_map.addTransformListener(onTransformListener);
-list=new ArrayList<GeoCoordinate>();
-             list=MapActivity.orderlist;
+                            list=new ArrayList<GeoCoordinate>();
+                            list=MapActivity.orderlist;
                             PositioningManager.getInstance().start(PositioningManager.LocationMethod.GPS_NETWORK);
 
                             final RoutePlan routePlan = new RoutePlan();
-int listsize=(list.size())-1;
-Log.e("Size",""+listsize);
+                            int listsize=(list.size())-1;
+                            Log.e("Size",""+listsize);
                      //       GeoCoordinate final=new GeoCoordinate(list.get());
                             // these two waypoints cover suburban roads
-              for(int i=0;i<listsize;i++)
-              {
-                  routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(list.get(i).getLatitude(),list.get(i).getLongitude())));
-              }
+                              for(int i=0;i<listsize;i++)
+                              {
+                                  routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(list.get(i).getLatitude(),list.get(i).getLongitude())));
+                              }
                             RouteOptions routeOptions = new RouteOptions();
                             if(MapActivity.vehicle.equals("bike")) {
                                 routeOptions.setTransportMode(RouteOptions.TransportMode.SCOOTER);
