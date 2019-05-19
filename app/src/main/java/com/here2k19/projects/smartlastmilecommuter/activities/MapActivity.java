@@ -131,6 +131,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
 
                         @Override
                         public void waypointsError(String error) {
+                            drawRouteForOrder(orderlocation);
                             Log.e("Error","Error:"+error);
                         }
                     });

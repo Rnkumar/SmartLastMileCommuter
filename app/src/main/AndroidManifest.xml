@@ -58,5 +58,5 @@
             android:name="com.here.services.internal.LocationService"
             android:process=":remote"/>
 
-</application>>
+</application>
 </manifest>

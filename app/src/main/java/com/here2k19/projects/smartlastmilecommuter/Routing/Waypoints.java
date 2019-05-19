@@ -97,7 +97,7 @@ public class Waypoints {
                 waypointListener.waypointsError(error+"");
             }
         });
-        jsonArrayRequest.setRetryPolicy(new DefaultRetryPolicy(10000,0,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        jsonArrayRequest.setRetryPolicy(new DefaultRetryPolicy(10000,-1,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         requestQueue.add(jsonArrayRequest);
     }
 }

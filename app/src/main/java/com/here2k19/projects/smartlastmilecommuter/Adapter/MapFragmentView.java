@@ -223,6 +223,8 @@ public class MapFragmentView{
                      */
                     m_map.zoomTo(m_geoBoundingBox, Map.Animation.NONE, 0f);
                     m_naviControlButton.setText(R.string.start_navi);
+                    textView.setText("");
+                    estimatedTime.setText("");
                     m_route = null;
                 }
             }
