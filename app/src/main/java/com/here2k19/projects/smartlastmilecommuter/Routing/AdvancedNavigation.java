@@ -1,6 +1,29 @@
 package com.here2k19.projects.smartlastmilecommuter.Routing;
 
+/*
+ * Copyright (c) 2011-2019 HERE Europe B.V.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
+
+import android.support.v7.app.AppCompatActivity;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.PointF;
+import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -13,18 +36,16 @@ import com.here.android.mpa.common.PositioningManager;
 import com.here.android.mpa.common.ViewObject;
 import com.here.android.mpa.guidance.NavigationManager;
 import com.here.android.mpa.mapping.Map;
+import com.here.android.mpa.mapping.SupportMapFragment;
 import com.here.android.mpa.mapping.MapGesture;
 import com.here.android.mpa.mapping.MapMarker;
 import com.here.android.mpa.mapping.MapState;
 import com.here.android.mpa.mapping.OnMapRenderListener;
-import com.here.android.mpa.mapping.SupportMapFragment;
 import com.here.android.mpa.routing.CoreRouter;
 import com.here.android.mpa.routing.Maneuver;
 import com.here.android.mpa.routing.Route;
-import com.here.android.mpa.routing.RouteOptions;
 import com.here.android.mpa.routing.RoutePlan;
 import com.here.android.mpa.routing.RouteResult;
-import com.here.android.mpa.routing.RouteTta;
 import com.here.android.mpa.routing.RouteWaypoint;
 import com.here.android.mpa.routing.RoutingError;
 import com.here2k19.projects.smartlastmilecommuter.R;
@@ -33,32 +54,28 @@ import com.here2k19.projects.smartlastmilecommuter.activities.MapActivity;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.List;
 
-public class MapFragmentView1 extends NavigationManager.NewInstructionEventListener {
+/**
+ * Besides the turn-by-turn navigation example app, This app covers 2 other common use cases:
+ * - usage of MapUpdateMode#RoadView during navigation and its interactions with user gestures.
+ * - using a MapMarker as position indicator and how to make the movements smooth and
+ * synchronized with map movements.
+ */
+public class AdvancedNavigation extends NavigationManager.NewInstructionEventListener{
     private SupportMapFragment m_mapFragment;
     private Map m_map;
-    NavigationManager navigationManager;
+
     private MapMarker m_positionIndicatorFixed = null;
     private PointF m_mapTransformCenter;
     private boolean m_returningToRoadViewMode = false;
     private double m_lastZoomLevelInRoadViewMode = 0.0;
     private MapActivity m_activity;
-    List<GeoCoordinate> list;
-    public MapFragmentView1(MapActivity activity) {
+NavigationManager navigationManager;
+    public AdvancedNavigation(MapActivity activity) {
         m_activity = activity;
         initMapFragment();
     }
-
-    private SupportMapFragment getMapFragment() {
-        return (SupportMapFragment) m_activity.getSupportFragmentManager().findFragmentById(R.id.mapfragment);
-    }
-
-    public MapFragmentView1() {
-        super();
-    }
-
     @Override
     public void onNewInstructionEvent() {
         super.onNewInstructionEvent();
@@ -67,7 +84,7 @@ public class MapFragmentView1 extends NavigationManager.NewInstructionEventListe
         if (maneuver != null) {
             if (maneuver.getAction() == Maneuver.Action.END) {
                 // notify the user that the route is complete
-            Toast.makeText(m_activity,"Route is complete",Toast.LENGTH_LONG);
+                Toast.makeText(m_activity,"Route is complete",Toast.LENGTH_LONG);
             }
             TextView textView=m_activity.findViewById(R.id.maneveur);
             Maneuver.Turn turn = maneuver.getTurn();
@@ -77,6 +94,10 @@ public class MapFragmentView1 extends NavigationManager.NewInstructionEventListe
             String data = "Take a "+turnName+" in "+distance+"mts"+" to "+ nextRoadName;
             textView.setText(data);
         }
+    }
+
+    private SupportMapFragment getMapFragment() {
+        return (SupportMapFragment) m_activity.getSupportFragmentManager().findFragmentById(R.id.mapfragment);
     }
 
     private void initMapFragment() {
@@ -104,52 +125,27 @@ public class MapFragmentView1 extends NavigationManager.NewInstructionEventListe
                             m_map = m_mapFragment.getMap();
                             m_map.setZoomLevel(19);
                             m_map.addTransformListener(onTransformListener);
-                            list=new ArrayList<GeoCoordinate>();
-                            list=MapActivity.orderlist;
-                            PositioningManager.getInstance().start(PositioningManager.LocationMethod.GPS_NETWORK);
 
-                            final RoutePlan routePlan = new RoutePlan();
-                            int listsize=(list.size())-1;
-                            Log.e("Size",""+listsize);
-                     //       GeoCoordinate final=new GeoCoordinate(list.get());
-                            // these two waypoints cover suburban roads
-                              for(int i=0;i<listsize;i++)
-                              {
-                                  routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(list.get(i).getLatitude(),list.get(i).getLongitude())));
-                              }
-                            RouteOptions routeOptions = new RouteOptions();
-                            if(MapActivity.vehicle.equals("bike")) {
-                                routeOptions.setTransportMode(RouteOptions.TransportMode.SCOOTER);
-                                routeOptions.setRouteType(RouteOptions.Type.FASTEST);
-                                routePlan.setRouteOptions(routeOptions);
-                            }
-                            else
-                            {
-                                routeOptions.setTransportMode(RouteOptions.TransportMode.CAR);
-                                routeOptions.setRouteType(RouteOptions.Type.FASTEST);
-                                routePlan.setRouteOptions(routeOptions);
-                            }
-//                            routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(MapActivity.adminloc)));
-//                            routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(list.get(listsize).getLatitude(),list.get(listsize).getLongitude())));
+                            PositioningManager.getInstance().start(PositioningManager.LocationMethod.GPS_NETWORK);
+//                            final RoutePlan routePlan = new RoutePlan();
+//
+//                            // these two waypoints cover suburban roads
+//                            routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(48.98382, 2.50292)));
+//                            routePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(48.95602, 2.45939)));
 
                             try {
                                 // calculate a route for navigation
                                 CoreRouter coreRouter = new CoreRouter();
-                                coreRouter.calculateRoute(routePlan, new CoreRouter.Listener() {
+                                coreRouter.calculateRoute(MapActivity.routePlanOrder, new CoreRouter.Listener() {
                                     @Override
                                     public void onCalculateRouteFinished(List<RouteResult> list,
                                                                          RoutingError routingError) {
                                         if (routingError == RoutingError.NONE) {
                                             Route route = list.get(0).getRoute();
-                                            RouteTta tt = route.getTta(Route.TrafficPenaltyMode.OPTIMAL,route.getSublegCount()>0&&route.getSublegCount()!=1?1:0);
-                                            long timeInSeconds = tt.getDuration();
-                                            long timeInMinutes = timeInSeconds/60;
-                                            TextView textView = m_activity.findViewById(R.id.tim);
-                                            textView.append(timeInMinutes+"mins"+"\n");
 
                                             // move the map to the first waypoint which is starting point of
                                             // the route
-                                            m_map.setCenter(routePlan.getWaypoint(0).getNavigablePosition(),
+                                            m_map.setCenter(MapActivity.routePlanOrder.getWaypoint(0).getNavigablePosition(),
                                                     Map.Animation.NONE);
 
                                             // setting MapUpdateMode to RoadView will enable automatic map
@@ -230,14 +226,12 @@ public class MapFragmentView1 extends NavigationManager.NewInstructionEventListe
             public void onPreDraw() {
                 if (m_positionIndicatorFixed != null) {
                     if (NavigationManager.getInstance()
-                            .getMapUpdateMode().equals(NavigationManager.MapUpdateMode.ROADVIEW))
-                    {
+                            .getMapUpdateMode().equals(NavigationManager.MapUpdateMode.ROADVIEW)) {
                         if (!m_returningToRoadViewMode) {
                             // when road view is active, we set the position indicator to align
                             // with the current map transform center to synchronize map and map
                             // marker movements.
                             m_positionIndicatorFixed.setCoordinate(m_map.pixelToGeo(m_mapTransformCenter));
-                        onNewInstructionEvent();
                         }
                     }
                 }
@@ -271,6 +265,7 @@ public class MapFragmentView1 extends NavigationManager.NewInstructionEventListe
                     .MapUpdateMode.NONE) && !m_returningToRoadViewMode)
                 // use this updated position when map is not updated by RoadView.
                 m_positionIndicatorFixed.setCoordinate(position.getCoordinate());
+            onNewInstructionEvent();
         }
 
         @Override

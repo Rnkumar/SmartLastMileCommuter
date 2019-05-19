@@ -49,7 +49,7 @@ import com.here2k19.projects.smartlastmilecommuter.Delivery.SubOrdersModel;
 import com.here2k19.projects.smartlastmilecommuter.Geocoding.MainView;
 import com.here2k19.projects.smartlastmilecommuter.Notification.SendNotification;
 import com.here2k19.projects.smartlastmilecommuter.R;
-import com.here2k19.projects.smartlastmilecommuter.Routing.MapFragmentView1;
+import com.here2k19.projects.smartlastmilecommuter.Routing.AdvancedNavigation;
 import com.here2k19.projects.smartlastmilecommuter.Routing.Positioning;
 import com.here2k19.projects.smartlastmilecommuter.Routing.WaypointListener;
 import com.here2k19.projects.smartlastmilecommuter.Routing.Waypoints;
@@ -76,7 +76,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
 
     private SupportMapFragment mapFragment = null;
     CoreRouter coreRouter;
-
+public static RoutePlan routePlanOrder;
     public static GeoCoordinate currentloc,adminloc;
     double currentloclat,currentloclang;
     Button orders;
@@ -270,7 +270,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
         bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MapFragmentView1 mapFragmentView1=new MapFragmentView1(MapActivity.this);
+                AdvancedNavigation advancedNavigation=new AdvancedNavigation(MapActivity.this);
             }
         });
         // Search for the map fragment to finish setup by calling init().
@@ -487,8 +487,6 @@ for(int i=0;i<listOfValues.size();i++)
     private void drawRoute(GeoCoordinate adminloc, GeoCoordinate currentloc) {
 
         m_mapFragmentView.initNaviControlButton(currentloc,adminloc);
-
-        if(2==2)return;
         coreRouter=new CoreRouter();
         RoutePlan routePlan=new RoutePlan();
         routePlan.addWaypoint(new RouteWaypoint(adminloc));
@@ -519,10 +517,8 @@ for(int i=0;i<listOfValues.size();i++)
                     long timeInSeconds = tt.getDuration();
                     long timeInMinutes = timeInSeconds/60;
                     time.append(timeInMinutes+"mins"+"\n");
-
                     adminLocationRoute = new MapRoute(routeResults.get(0).getRoute());
                     map.addMapObject(adminLocationRoute);
-
                 }
                 else {
                     // Display a message indicating route calculation failure
@@ -538,14 +534,14 @@ private void drawRouteForOrder(List<GeoCoordinate> arrayList)
     }
     orderlist=arrayList;
     coreRouter=new CoreRouter();
-    RoutePlan routePlan=new RoutePlan();
+     routePlanOrder=new RoutePlan();
     MainView mainView=new MainView(this);
     double lat,lang;
 
     Log.e("Coordinates::",arrayList.toString());
 
     for(int i=0;i<arrayList.size();i++) {
-        routePlan.addWaypoint(new RouteWaypoint(arrayList.get(i)));
+        routePlanOrder.addWaypoint(new RouteWaypoint(arrayList.get(i)));
         lat=arrayList.get(i).getLatitude();
         lang=arrayList.get(i).getLongitude();
         mainView.triggerRevGeocodeRequest(lat,lang);
@@ -560,15 +556,15 @@ private void drawRouteForOrder(List<GeoCoordinate> arrayList)
     if(vehicle.equals("bike")) {
         routeOptions.setTransportMode(RouteOptions.TransportMode.SCOOTER);
         routeOptions.setRouteType(RouteOptions.Type.FASTEST);
-        routePlan.setRouteOptions(routeOptions);
+        routePlanOrder.setRouteOptions(routeOptions);
     }
     else
     {
         routeOptions.setTransportMode(RouteOptions.TransportMode.CAR);
         routeOptions.setRouteType(RouteOptions.Type.FASTEST);
-        routePlan.setRouteOptions(routeOptions);
+        routePlanOrder.setRouteOptions(routeOptions);
     }
-    coreRouter.calculateRoute(routePlan, new Router.Listener<List<RouteResult>, RoutingError>() {
+    coreRouter.calculateRoute(routePlanOrder, new Router.Listener<List<RouteResult>, RoutingError>() {
         @Override
         public void onProgress(int i) {
 

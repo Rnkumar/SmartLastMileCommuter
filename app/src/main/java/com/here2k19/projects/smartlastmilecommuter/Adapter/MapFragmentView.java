@@ -135,7 +135,7 @@ public class MapFragmentView{
         routeOptions.setHighwaysAllowed(false);
         /* Calculate the shortest route available. */
         routeOptions.setRouteType(RouteOptions.Type.SHORTEST);
-        /* Calculate 1 route. */
+        /* git Calculate 1 route. */
         routeOptions.setRouteCount(1);
         /* Finally set the route option */
         routePlan.setRouteOptions(routeOptions);
