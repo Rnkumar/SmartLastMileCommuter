@@ -140,44 +140,7 @@ public static RoutePlan routePlanOrder;
         });
         appCompatActivity=new AppCompatActivity();
 
-           /* Handler handler=new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if(MainView.latitude!=null && MainView.longitude!=null){
-                    if(count==0) {
-                        adminlat = Double.parseDouble(MainView.latitude);
-                        adminlang = Double.parseDouble(MainView.longitude);
-                        currentloclat= Double.parseDouble(String.valueOf(Positioning.latitude));
-                        currentloclang= Double.parseDouble(String.valueOf(Positioning.longitude));
-                    if(map!=null)
-                    {
-                        getAlert();
-                       Handler handler1=new Handler();
-                       handler1.postDelayed(new Runnable() {
-                           @Override
-                           public void run() {
-                               if(getalert) {
-                                   ArrayList<MapObject> markers = new ArrayList<MapObject>();
-                                   markers.add(new MapMarker(new GeoCoordinate(currentloclat, currentloclang)).setTitle("ahii").setDescription("dfdf"));
-                                   markers.add(new MapMarker(new GeoCoordinate(adminlat, adminlang)).setTitle(adminloc.getLatitude()+","+adminloc.getLongitude()));
-                                   map.addMapObjects(markers);
 
-                                   map.setCenter(new GeoCoordinate(currentloclat, currentloclang, 0.0),
-                                           Map.Animation.NONE);
-                               }
-                           }
-                       },5000);
-
-
-            }
-                currentloc=new GeoCoordinate(currentloclat,currentloclang);
-                drawRoute(adminloc,currentloc);
-                count++;
-            }
-                    }
-                }
-            },2000);*/
     }
 
     private void getAlert() {

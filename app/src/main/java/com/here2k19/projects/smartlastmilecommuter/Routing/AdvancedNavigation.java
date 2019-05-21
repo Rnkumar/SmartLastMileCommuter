@@ -18,6 +18,7 @@ package com.here2k19.projects.smartlastmilecommuter.Routing;
 
 
 
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -35,6 +36,9 @@ import com.here.android.mpa.common.OnEngineInitListener;
 import com.here.android.mpa.common.PositioningManager;
 import com.here.android.mpa.common.ViewObject;
 import com.here.android.mpa.guidance.NavigationManager;
+import com.here.android.mpa.guidance.VoiceCatalog;
+import com.here.android.mpa.guidance.VoiceGuidanceOptions;
+import com.here.android.mpa.guidance.VoicePackage;
 import com.here.android.mpa.mapping.Map;
 import com.here.android.mpa.mapping.SupportMapFragment;
 import com.here.android.mpa.mapping.MapGesture;
@@ -46,6 +50,7 @@ import com.here.android.mpa.routing.Maneuver;
 import com.here.android.mpa.routing.Route;
 import com.here.android.mpa.routing.RoutePlan;
 import com.here.android.mpa.routing.RouteResult;
+import com.here.android.mpa.routing.RouteTta;
 import com.here.android.mpa.routing.RouteWaypoint;
 import com.here.android.mpa.routing.RoutingError;
 import com.here2k19.projects.smartlastmilecommuter.R;
@@ -65,21 +70,27 @@ import java.util.List;
 public class AdvancedNavigation extends NavigationManager.NewInstructionEventListener{
     private SupportMapFragment m_mapFragment;
     private Map m_map;
-
+public static double deslatitude,deslongitude;
     private MapMarker m_positionIndicatorFixed = null;
     private PointF m_mapTransformCenter;
     private boolean m_returningToRoadViewMode = false;
     private double m_lastZoomLevelInRoadViewMode = 0.0;
     private MapActivity m_activity;
-NavigationManager navigationManager;
+public NavigationManager navigationManager=null;
+RoutePlan getEtaRoutePlan;
+TextView time;
     public AdvancedNavigation(MapActivity activity) {
         m_activity = activity;
+     time=activity.findViewById(R.id.tim);
+     getEtaRoutePlan=new RoutePlan();
         initMapFragment();
+        navigationManager=NavigationManager.getInstance();
+        //getVoice();
     }
     @Override
     public void onNewInstructionEvent() {
         super.onNewInstructionEvent();
-        navigationManager=NavigationManager.getInstance();
+        navigationManager=navigationManager;
         Maneuver maneuver = navigationManager.getNextManeuver();
         if (maneuver != null) {
             if (maneuver.getAction() == Maneuver.Action.END) {
@@ -142,15 +153,20 @@ NavigationManager navigationManager;
                                                                          RoutingError routingError) {
                                         if (routingError == RoutingError.NONE) {
                                             Route route = list.get(0).getRoute();
-
+                                        int k=MapActivity.routePlanOrder.getWaypointCount();
+                                        Log.e("count",""+k);
+                                        deslatitude=list.get(0).getRoute().getWaypoints().get(k-1).getLatitude();
+                                        deslongitude=list.get(0).getRoute().getWaypoints().get(k-1).getLongitude();
+                                        //  deslatitude cor=MapActivity.routePlanOrder.getWaypoint((list.size())-1).get;
                                             // move the map to the first waypoint which is starting point of
                                             // the route
+
                                             m_map.setCenter(MapActivity.routePlanOrder.getWaypoint(0).getNavigablePosition(),
                                                     Map.Animation.NONE);
 
                                             // setting MapUpdateMode to RoadView will enable automatic map
                                             // movements and zoom level adjustments
-                                            NavigationManager.getInstance().setMapUpdateMode
+                                            navigationManager.setMapUpdateMode
                                                     (NavigationManager.MapUpdateMode.ROADVIEW);
 
                                             // adjust tilt to show 3D view
@@ -178,7 +194,7 @@ NavigationManager navigationManager;
 
                                             m_mapFragment.getPositionIndicator().setVisible(false);
 
-                                            NavigationManager.getInstance().setMap(m_map);
+                                            navigationManager.setMap(m_map);
 
                                             // listen to real position updates. This is used when RoadView is
                                             // not active.
@@ -188,11 +204,13 @@ NavigationManager navigationManager;
 
                                             // listen to updates from RoadView which tells you where the map
                                             // center should be situated. This is used when RoadView is active.
-                                            NavigationManager.getInstance().getRoadView().addListener(new
+                                            navigationManager.getRoadView().addListener(new
                                                     WeakReference<NavigationManager.RoadView.Listener>(roadViewListener));
-
+                                            navigationManager.addPositionListener(
+                                                    new WeakReference<NavigationManager.PositionListener>(positionListener));
                                             // start navigation simulation travelling at 13 meters per second
-                                            NavigationManager.getInstance().simulate(route, 13);
+                                            navigationManager.simulate(route,60);
+                                         getVoice();
 
                                         } else {
                                             Toast.makeText(m_activity,
@@ -225,7 +243,7 @@ NavigationManager navigationManager;
             @Override
             public void onPreDraw() {
                 if (m_positionIndicatorFixed != null) {
-                    if (NavigationManager.getInstance()
+                    if (navigationManager
                             .getMapUpdateMode().equals(NavigationManager.MapUpdateMode.ROADVIEW)) {
                         if (!m_returningToRoadViewMode) {
                             // when road view is active, we set the position indicator to align
@@ -256,16 +274,83 @@ NavigationManager navigationManager;
 
     }
 
+    private void getVoice() {
+        final VoiceCatalog voiceCatalog=VoiceCatalog.getInstance();
+        voiceCatalog.downloadCatalog(new VoiceCatalog.OnDownloadDoneListener() {
+            @Override
+            public void onDownloadDone(VoiceCatalog.Error error) {
+if(error== VoiceCatalog.Error.NONE)
+{
+Log.e("catalog","downloadSuccessful");
+    List<VoicePackage> voicePackages =voiceCatalog.getCatalogList();
+
+    long id = -1;
+
+// select
+    for (VoicePackage vPackage : voicePackages) {
+        if (vPackage.getMarcCode().compareToIgnoreCase("eng") == 0) {
+            if (vPackage.isTts()) {
+                id = vPackage.getId();
+                break;
+            }
+        }
+    }
+    if (!voiceCatalog.isLocalVoiceSkin(id))
+    {
+        final long finalId = id;
+        voiceCatalog.downloadVoice(id, new VoiceCatalog.OnDownloadDoneListener() {
+            @Override
+            public void onDownloadDone(VoiceCatalog.Error error) {
+Log.e("voiceskin","voiceskinDownloadsuccess");
+
+            }
+
+        });
+    }
+    else if(voiceCatalog.isLocalVoiceSkin(id))
+    {
+        VoiceGuidanceOptions voiceGuidanceOptions = navigationManager.getVoiceGuidanceOptions();
+        voiceGuidanceOptions.setVoiceSkin(voiceCatalog.getLocalVoiceSkin(id));
+    }
+
+
+
+}
+            }
+        });
+    }
+    private NavigationManager.PositionListener positionListener
+            = new NavigationManager.PositionListener() {
+
+        @Override
+        public void onPositionUpdated(GeoPosition loc) {
+            // the position we get in this callback can be used
+            // to reposition the map and change orientation.
+            loc.getCoordinate();
+            loc.getHeading();
+            loc.getSpeed();
+            //double time=navigationManager.getTta(Route.TrafficPenaltyMode.DISABLED,true);
+            //getEta(loc.getCoordinate());
+            // also remaining time and distance can be
+            // fetched from navigation manager
+            navigationManager.getTta(Route.TrafficPenaltyMode.DISABLED, true);
+            navigationManager.getDestinationDistance();
+        }
+    };
+
     // listen for positioning events
     private PositioningManager.OnPositionChangedListener mapPositionHandler = new PositioningManager.OnPositionChangedListener() {
         @Override
-        public void onPositionUpdated(PositioningManager.LocationMethod method, GeoPosition position,
+        public void onPositionUpdated(PositioningManager.LocationMethod method, final GeoPosition position,
                                       boolean isMapMatched) {
-            if (NavigationManager.getInstance().getMapUpdateMode().equals(NavigationManager
+            if (navigationManager.getMapUpdateMode().equals(NavigationManager
                     .MapUpdateMode.NONE) && !m_returningToRoadViewMode)
                 // use this updated position when map is not updated by RoadView.
                 m_positionIndicatorFixed.setCoordinate(position.getCoordinate());
+
+
             onNewInstructionEvent();
+
         }
 
         @Override
@@ -275,13 +360,47 @@ NavigationManager navigationManager;
         }
     };
 
+    private void getEta(GeoCoordinate coordinate) {
+    if(deslatitude!=0.0 && deslongitude!=0.0)
+    {
+        if(getEtaRoutePlan!=null)
+        {
+            getEtaRoutePlan.removeAllWaypoints();
+        }
+        else {
+            getEtaRoutePlan.addWaypoint(new RouteWaypoint(coordinate));
+            getEtaRoutePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(deslatitude, deslongitude)));
+            try {
+                CoreRouter coreRouter = new CoreRouter();
+                coreRouter.calculateRoute(getEtaRoutePlan, new CoreRouter.Listener() {
+                    @Override
+                    public void onCalculateRouteFinished(List<RouteResult> list, RoutingError routingError) {
+                   Log.e("gogog","ennter");
+                        RouteTta tt = list.get(0).getRoute().getTta(Route.TrafficPenaltyMode.OPTIMAL,list.get(0).getRoute().getSublegCount()>0&&list.get(0).getRoute().getSublegCount()!=1?1:0);
+                        long timeInSeconds = tt.getDuration();
+                        long timeInMinutes = timeInSeconds/60;
+                        time.append(timeInMinutes+"mins"+"\n");
+                    }
+
+                    @Override
+                    public void onProgress(int i) {
+
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    }
+
     private void pauseRoadView() {
         // pause RoadView so that map will stop moving, the map marker will use updates from
         // PositionManager callback to update its position.
 
-        if (NavigationManager.getInstance().getMapUpdateMode().equals(NavigationManager.MapUpdateMode.ROADVIEW)) {
-            NavigationManager.getInstance().setMapUpdateMode(NavigationManager.MapUpdateMode.NONE);
-            NavigationManager.getInstance().getRoadView().removeListener(roadViewListener);
+        if (navigationManager.getMapUpdateMode().equals(NavigationManager.MapUpdateMode.ROADVIEW)) {
+            navigationManager.setMapUpdateMode(NavigationManager.MapUpdateMode.NONE);
+            navigationManager.getRoadView().removeListener(roadViewListener);
             m_lastZoomLevelInRoadViewMode = m_map.getZoomLevel();
         }
     }
@@ -389,9 +508,9 @@ NavigationManager navigationManager;
             // do not start RoadView and its listener until moving map to current position has
             // completed
             if (m_returningToRoadViewMode) {
-                NavigationManager.getInstance().setMapUpdateMode(NavigationManager.MapUpdateMode
+                navigationManager.setMapUpdateMode(NavigationManager.MapUpdateMode
                         .ROADVIEW);
-                NavigationManager.getInstance().getRoadView().addListener(new
+                navigationManager.getRoadView().addListener(new
                         WeakReference<NavigationManager.RoadView.Listener>(roadViewListener));
                 m_returningToRoadViewMode = false;
             }
@@ -401,12 +520,12 @@ NavigationManager navigationManager;
 
     public void onDestroy() {
         m_map.removeMapObject(m_positionIndicatorFixed);
-        NavigationManager.getInstance().stop();
+        navigationManager.stop();
         PositioningManager.getInstance().stop();
     }
 
     public void onBackPressed() {
-        if (NavigationManager.getInstance().getMapUpdateMode().equals(NavigationManager
+        if (navigationManager.getMapUpdateMode().equals(NavigationManager
                 .MapUpdateMode.NONE)) {
             resumeRoadView();
         } else {
