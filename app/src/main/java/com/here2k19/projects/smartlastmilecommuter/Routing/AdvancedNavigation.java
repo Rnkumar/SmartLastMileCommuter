@@ -29,6 +29,8 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.GeoPosition;
 import com.here.android.mpa.common.Image;
@@ -54,6 +56,7 @@ import com.here.android.mpa.routing.RouteTta;
 import com.here.android.mpa.routing.RouteWaypoint;
 import com.here.android.mpa.routing.RoutingError;
 import com.here2k19.projects.smartlastmilecommuter.R;
+import com.here2k19.projects.smartlastmilecommuter.Utils;
 import com.here2k19.projects.smartlastmilecommuter.activities.MapActivity;
 
 import java.io.File;
@@ -153,6 +156,8 @@ TextView time;
                                                                          RoutingError routingError) {
                                         if (routingError == RoutingError.NONE) {
                                             Route route = list.get(0).getRoute();
+                                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                            Utils.serializeRoute(route,user.getUid());
                                         int k=MapActivity.routePlanOrder.getWaypointCount();
                                         Log.e("count",""+k);
                                         deslatitude=list.get(0).getRoute().getWaypoints().get(k-1).getLatitude();

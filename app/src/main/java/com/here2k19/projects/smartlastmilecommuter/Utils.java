@@ -1,5 +1,12 @@
 package com.here2k19.projects.smartlastmilecommuter;
 
+import android.util.Base64;
+import android.util.Log;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.here.android.mpa.routing.Route;
+
 public class Utils {
 
     private static final String SHARED_PREFERENCE_NAME = "smartlastmiledriver";
@@ -11,6 +18,7 @@ public class Utils {
     private static final String ADDRESS_KEY = "address";
     private static final String LOCATION_KEY = "location";
     private static final String ORDERS_KEY = "orders";
+    private static final String DRIVER_KEY = "drivers";
 
     public static String getSharedPreferenceName() {
         return SHARED_PREFERENCE_NAME;
@@ -46,5 +54,21 @@ public class Utils {
 
     public static String getOrdersKey() {
         return ORDERS_KEY;
+    }
+
+    public static String getDriverKey() {
+        return DRIVER_KEY;
+    }
+
+    public static void serializeRoute(Route route, final String uid){
+        Route.serializeAsync(route, new Route.SerializationCallback() {
+            @Override
+            public void onSerializationComplete(Route.SerializationResult serializationResult) {
+                byte[] data = serializationResult.data;
+                String base64 = Base64.encodeToString(data, Base64.DEFAULT);
+                Log.e("Base: ",base64);
+                FirebaseDatabase.getInstance().getReference(getDriverKey()).child(uid).child("currentRoute").setValue(base64);
+            }
+        });
     }
 }
