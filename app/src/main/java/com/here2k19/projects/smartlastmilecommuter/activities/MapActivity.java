@@ -302,10 +302,9 @@ public static RoutePlan routePlanOrder;
                                             if (mapObject.getType() == MapObject.Type.MARKER) {
                                                 AdvancedNavigation.isMarkerClicked=true;
                                                 MapMarker window_marker = ((MapMarker) mapObject);
-<<<<<<< HEAD
                                                 //AdvancedNavigation advancedNavigation=new AdvancedNavigation(MapActivity.this);
                                                 advancedNavigation.getEta(AdvancedNavigation.currentposition,window_marker.getCoordinate());
-=======
+
 
                                                 View v = getLayoutInflater().inflate(R.layout.markerpopup,null);
                                                 final MapOverlay mapOverlay = new MapOverlay(v,window_marker.getCoordinate());
@@ -322,7 +321,7 @@ public static RoutePlan routePlanOrder;
                                             //    System.out.println("Title is................."+window_marker.getTitle());
                                                 Log.e("Totle",""+window_marker.getCoordinate());
   //                                              popup(window_marker.getCoordinate());
->>>>>>> 804d3b98f7db30c8a01ceb350098f7885ddbfa08
+
                                                 return true;
                                             }
                                         }
