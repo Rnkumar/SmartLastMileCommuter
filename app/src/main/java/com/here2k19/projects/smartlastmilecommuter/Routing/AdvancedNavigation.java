@@ -1,21 +1,5 @@
 package com.here2k19.projects.smartlastmilecommuter.Routing;
 
-/*
- * Copyright (c) 2011-2019 HERE Europe B.V.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 
 
 import android.os.Handler;
@@ -62,6 +46,7 @@ import com.here2k19.projects.smartlastmilecommuter.activities.MapActivity;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -78,16 +63,23 @@ public static double deslatitude,deslongitude;
     private PointF m_mapTransformCenter;
     private boolean m_returningToRoadViewMode = false;
     private double m_lastZoomLevelInRoadViewMode = 0.0;
+    public static boolean isMarkerClicked=false;
     private MapActivity m_activity;
 public NavigationManager navigationManager=null;
 RoutePlan getEtaRoutePlan;
 TextView time;
+public static List<RouteResult> list1;
+ArrayList<Double> timeList;
+public static int Speed;
+public static GeoCoordinate currentposition;
     public AdvancedNavigation(MapActivity activity) {
         m_activity = activity;
      time=activity.findViewById(R.id.tim);
      getEtaRoutePlan=new RoutePlan();
         initMapFragment();
         navigationManager=NavigationManager.getInstance();
+list1=new ArrayList<RouteResult>();
+   timeList=new ArrayList();
         //getVoice();
     }
     @Override
@@ -155,6 +147,7 @@ TextView time;
                                     public void onCalculateRouteFinished(List<RouteResult> list,
                                                                          RoutingError routingError) {
                                         if (routingError == RoutingError.NONE) {
+                                     list1=list;
                                             Route route = list.get(0).getRoute();
                                             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                                             Utils.serializeRoute(route,user.getUid());
@@ -162,9 +155,6 @@ TextView time;
                                         Log.e("count",""+k);
                                         deslatitude=list.get(0).getRoute().getWaypoints().get(k-1).getLatitude();
                                         deslongitude=list.get(0).getRoute().getWaypoints().get(k-1).getLongitude();
-                                        //  deslatitude cor=MapActivity.routePlanOrder.getWaypoint((list.size())-1).get;
-                                            // move the map to the first waypoint which is starting point of
-                                            // the route
 
                                             m_map.setCenter(MapActivity.routePlanOrder.getWaypoint(0).getNavigablePosition(),
                                                     Map.Animation.NONE);
@@ -200,7 +190,6 @@ TextView time;
                                             m_mapFragment.getPositionIndicator().setVisible(false);
 
                                             navigationManager.setMap(m_map);
-
                                             // listen to real position updates. This is used when RoadView is
                                             // not active.
                                             PositioningManager.getInstance().addListener(
@@ -351,9 +340,18 @@ Log.e("voiceskin","voiceskinDownloadsuccess");
             if (navigationManager.getMapUpdateMode().equals(NavigationManager
                     .MapUpdateMode.NONE) && !m_returningToRoadViewMode)
                 // use this updated position when map is not updated by RoadView.
+               // GeoCoordinate geoCoordinate=new GeoCoordinate(position.getCoordinate().getLatitude(),position.getCoordinate().getLongitude());
                 m_positionIndicatorFixed.setCoordinate(position.getCoordinate());
 
 
+            if(!isMarkerClicked)
+            {
+                currentposition=position.getCoordinate();
+                Speed= (int) position.getSpeed();
+                GeoCoordinate coordinate=new GeoCoordinate(deslatitude,deslongitude);
+                getEta(currentposition,coordinate);
+            }
+            // Log.e("time",""+time);
             onNewInstructionEvent();
 
         }
@@ -365,38 +363,15 @@ Log.e("voiceskin","voiceskinDownloadsuccess");
         }
     };
 
-    private void getEta(GeoCoordinate coordinate) {
-    if(deslatitude!=0.0 && deslongitude!=0.0)
-    {
-        if(getEtaRoutePlan!=null)
-        {
-            getEtaRoutePlan.removeAllWaypoints();
-        }
-        else {
-            getEtaRoutePlan.addWaypoint(new RouteWaypoint(coordinate));
-            getEtaRoutePlan.addWaypoint(new RouteWaypoint(new GeoCoordinate(deslatitude, deslongitude)));
-            try {
-                CoreRouter coreRouter = new CoreRouter();
-                coreRouter.calculateRoute(getEtaRoutePlan, new CoreRouter.Listener() {
-                    @Override
-                    public void onCalculateRouteFinished(List<RouteResult> list, RoutingError routingError) {
-                   Log.e("gogog","ennter");
-                        RouteTta tt = list.get(0).getRoute().getTta(Route.TrafficPenaltyMode.OPTIMAL,list.get(0).getRoute().getSublegCount()>0&&list.get(0).getRoute().getSublegCount()!=1?1:0);
-                        long timeInSeconds = tt.getDuration();
-                        long timeInMinutes = timeInSeconds/60;
-                        time.append(timeInMinutes+"mins"+"\n");
-                    }
-
-                    @Override
-                    public void onProgress(int i) {
-
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
+    public void getEta(GeoCoordinate position1,GeoCoordinate pos2) {
+      //  GeoCoordinate position2=new GeoCoordinate(deslatitude,deslongitude);
+        double distance=position1.distanceTo(pos2);
+        double speed = 3;
+        if(Speed!=0) {
+           speed= Speed;
+       }
+        int time1= (int) (distance/speed);
+        time.setText(time1+"mins");
     }
 
     private void pauseRoadView() {
