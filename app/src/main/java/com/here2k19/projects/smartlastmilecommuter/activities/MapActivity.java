@@ -25,6 +25,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.OnEngineInitListener;
 import com.here.android.mpa.common.ViewObject;
@@ -54,6 +56,7 @@ import com.here2k19.projects.smartlastmilecommuter.Routing.AdvancedNavigation;
 import com.here2k19.projects.smartlastmilecommuter.Routing.Positioning;
 import com.here2k19.projects.smartlastmilecommuter.Routing.WaypointListener;
 import com.here2k19.projects.smartlastmilecommuter.Routing.Waypoints;
+import com.here2k19.projects.smartlastmilecommuter.Utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -498,6 +501,8 @@ for(int i=0;i<listOfValues.size();i++)
                     long timeInMinutes = timeInSeconds/60;
                     time.append(timeInMinutes+"mins"+"\n");
                     adminLocationRoute = new MapRoute(routeResults.get(0).getRoute());
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    Utils.serializeRoute(routeResults.get(0).getRoute(),user.getUid());
                     map.addMapObject(adminLocationRoute);
                 }
                 else {
@@ -564,7 +569,8 @@ private void drawRouteForOrder(List<GeoCoordinate> arrayList)
                 ordersRoute = new MapRoute(routeResults.get(0).getRoute());
                 Log.e("orders:",ordersRoute.getRoute().getWaypoints().toString());
                 map.addMapObject(ordersRoute);
-
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                Utils.serializeRoute(routeResults.get(0).getRoute(),user.getUid());
             }else {
                 // Display a message indicating route calculation failure
             }
@@ -625,9 +631,15 @@ private void drawRouteForOrder(List<GeoCoordinate> arrayList)
     @Override
     public void onCalculateRouteFinished(List<RouteResult> list, RoutingError routingError) {
         if (routingError == RoutingError.NONE) {
-            MapRoute mapRoute = new MapRoute(list.get(0).getRoute());
+            Route route = list.get(0).getRoute();
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            Utils.serializeRoute(route,user.getUid());
+            MapRoute mapRoute = new MapRoute(route);
             map.addMapObject(mapRoute);
         }
     }
+
+
+
 }
 
