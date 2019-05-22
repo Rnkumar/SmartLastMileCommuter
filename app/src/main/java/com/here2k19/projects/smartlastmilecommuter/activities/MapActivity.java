@@ -32,6 +32,7 @@ import com.here.android.mpa.mapping.Map;
 import com.here.android.mpa.mapping.MapGesture;
 import com.here.android.mpa.mapping.MapMarker;
 import com.here.android.mpa.mapping.MapObject;
+import com.here.android.mpa.mapping.MapOverlay;
 import com.here.android.mpa.mapping.MapRoute;
 import com.here.android.mpa.mapping.SupportMapFragment;
 import com.here.android.mpa.routing.CoreRouter;
@@ -120,7 +121,7 @@ public static RoutePlan routePlanOrder;
                     SharedPreferences sharedPreferences = getSharedPreferences("commuter", Context.MODE_PRIVATE);
                     String name = sharedPreferences.getString("name","");
                     String mobile = sharedPreferences.getString("mobile","");
-                    SendNotification.notify(MapActivity.this,"push","Your items will be delivered by "+name+"("+mobile+")today.");
+                    //SendNotification.notify(MapActivity.this,"push","Your items will be delivered by "+name+"("+mobile+")today.");
                     Waypoints waypoints=new Waypoints();
                     waypoints.getWaypoints(orderlocation, MapActivity.this, new WaypointListener() {
                         @Override
@@ -301,6 +302,18 @@ public static RoutePlan routePlanOrder;
                                             if (mapObject.getType() == MapObject.Type.MARKER) {
 
                                                 MapMarker window_marker = ((MapMarker) mapObject);
+
+                                                View v = getLayoutInflater().inflate(R.layout.markerpopup,null);
+                                                final MapOverlay mapOverlay = new MapOverlay(v,window_marker.getCoordinate());
+                                                TextView info = v.findViewById(R.id.info);
+                                                v.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View v) {
+                                                        map.removeMapOverlay(mapOverlay);
+                                                    }
+                                                });
+                                                info.setText(window_marker.getDescription());
+                                                map.addMapOverlay(mapOverlay);
 
                                             //    System.out.println("Title is................."+window_marker.getTitle());
                                                 Log.e("Totle",""+window_marker.getCoordinate());
