@@ -372,6 +372,17 @@ Log.e("voiceskin","voiceskinDownloadsuccess");
        }
         int time1= (int) (distance/speed);
         time.setText(time1+"mins");
+
+    }
+    public String getEtaforBubble(GeoCoordinate position1,GeoCoordinate pos2)
+    {
+        double distance=position1.distanceTo(pos2);
+        double speed = 3;
+        if(Speed!=0) {
+            speed= Speed;
+        }
+        int time1= (int) (distance/speed);
+        return time1+":"+distance;
     }
 
     private void pauseRoadView() {

@@ -36,7 +36,9 @@ import com.here.android.mpa.mapping.MapMarker;
 import com.here.android.mpa.mapping.MapObject;
 import com.here.android.mpa.mapping.MapOverlay;
 import com.here.android.mpa.mapping.MapRoute;
+import com.here.android.mpa.mapping.MapTrafficLayer;
 import com.here.android.mpa.mapping.SupportMapFragment;
+import com.here.android.mpa.mapping.TrafficEvent;
 import com.here.android.mpa.routing.CoreRouter;
 import com.here.android.mpa.routing.Route;
 import com.here.android.mpa.routing.RouteOptions;
@@ -261,6 +263,9 @@ public static RoutePlan routePlanOrder;
                         // Set the map center to the Vancouver region (no animation)
                         // Set the zoom level to the average between min and max
                         map.setZoomLevel(15);
+                        MapTrafficLayer traffic = map.getMapTrafficLayer();
+// set the minimum displayed traffic level
+                        traffic.setDisplayFilter(TrafficEvent.Severity.VERY_HIGH);
                         currentloclat = Double.parseDouble(String.valueOf(Positioning.latitude));
                         currentloclang = Double.parseDouble(String.valueOf(Positioning.longitude));
 
@@ -306,9 +311,8 @@ public static RoutePlan routePlanOrder;
                                                 AdvancedNavigation.isMarkerClicked=true;
                                                 MapMarker window_marker = ((MapMarker) mapObject);
                                                 //AdvancedNavigation advancedNavigation=new AdvancedNavigation(MapActivity.this);
-                                                advancedNavigation.getEta(AdvancedNavigation.currentposition,window_marker.getCoordinate());
-
-
+                                               // advancedNavigation.getEta(AdvancedNavigation.currentposition,window_marker.getCoordinate());
+                                                String k=advancedNavigation.getEtaforBubble(AdvancedNavigation.currentposition,window_marker.getCoordinate());
                                                 View v = getLayoutInflater().inflate(R.layout.markerpopup,null);
                                                 final MapOverlay mapOverlay = new MapOverlay(v,window_marker.getCoordinate());
                                                 TextView info = v.findViewById(R.id.info);
@@ -318,7 +322,8 @@ public static RoutePlan routePlanOrder;
                                                         map.removeMapOverlay(mapOverlay);
                                                     }
                                                 });
-                                                info.setText(window_marker.getDescription());
+                                               String[] split=k.split(":");
+                                                info.setText("Time\t:"+split[0]+"mins"+"\nDistance\t:"+split[1]);
                                                 map.addMapOverlay(mapOverlay);
 
                                             //    System.out.println("Title is................."+window_marker.getTitle());
@@ -572,7 +577,8 @@ private void drawRouteForOrder(List<GeoCoordinate> arrayList)
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 Utils.serializeRoute(routeResults.get(0).getRoute(),user.getUid());
             }else {
-                // Display a message indicating route calculation failure
+                // Display a message indicatingp route calculation failure
+            Log.e("routingerror",""+routingError);
             }
         }
     });
