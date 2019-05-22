@@ -69,7 +69,7 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
     private static final String[] REQUIRED_SDK_PERMISSIONS = new String[] {
             Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE };
     boolean value,value1=false;
-
+AdvancedNavigation advancedNavigation;
     public static String vehicle="bike";
     private Map map = null;
     MapRoute adminLocationRoute;
@@ -233,7 +233,7 @@ public static RoutePlan routePlanOrder;
         bt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AdvancedNavigation advancedNavigation=new AdvancedNavigation(MapActivity.this);
+                advancedNavigation=new AdvancedNavigation(MapActivity.this);
             }
         });
         // Search for the map fragment to finish setup by calling init().
@@ -299,12 +299,10 @@ public static RoutePlan routePlanOrder;
                                             MapObject mapObject = (MapObject) viewObject;
 
                                             if (mapObject.getType() == MapObject.Type.MARKER) {
-
+                                                AdvancedNavigation.isMarkerClicked=true;
                                                 MapMarker window_marker = ((MapMarker) mapObject);
-
-                                            //    System.out.println("Title is................."+window_marker.getTitle());
-                                                Log.e("Totle",""+window_marker.getCoordinate());
-  //                                              popup(window_marker.getCoordinate());
+                                                //AdvancedNavigation advancedNavigation=new AdvancedNavigation(MapActivity.this);
+                                                advancedNavigation.getEta(AdvancedNavigation.currentposition,window_marker.getCoordinate());
                                                 return true;
                                             }
                                         }
