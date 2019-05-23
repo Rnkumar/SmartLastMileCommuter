@@ -21,5 +21,9 @@
     12. Then click on the start button.
     13. Simulation of route through all the waypoints(users) is displayed.
     14. In the orders screen, there is a logout option.
+    15. Voice Instructions is provided along with dynamic ETA.
+    16. While on route, you can click on markers to see the remaining distance and time.
+    17. Traffic incidents are also displayed on the map.
+    18. Route Serialization is done to share the route.
 
-### This link has the apk - https://drive.google.com/open?id=1N_d9XWxo0-m7B3IWl0PyVFSOA9S4257Z
+#### This link has the apk - https://drive.google.com/open?id=18IuPzpe7QSRiG8kWoko4hFa9pGz8zcWi
