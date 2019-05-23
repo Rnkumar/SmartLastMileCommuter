@@ -66,7 +66,7 @@ public class MapFragmentView{
     public MapFragmentView(MapActivity activity) {
         m_activity = activity;
         initMapFragment();
-        //initNaviControlButton();
+
     }
 
     private SupportMapFragment getMapFragment() {
@@ -123,11 +123,7 @@ public class MapFragmentView{
         /* Initialize a RoutePlan */
         RoutePlan routePlan = new RoutePlan();
 
-        /*
-         * Initialize a RouteOption.HERE SDK allow users to define their own parameters for the
-         * route calculation,including transport modes,route types and route restrictions etc.Please
-         * refer to API doc for full list of APIs
-         */
+
         RouteOptions routeOptions = new RouteOptions();
         /* Other transport modes are also available e.g Pedestrian */
         routeOptions.setTransportMode(RouteOptions.TransportMode.CAR);
@@ -178,7 +174,7 @@ public class MapFragmentView{
                                 RouteTta tt = m_route.getTta(Route.TrafficPenaltyMode.OPTIMAL,m_route.getSublegCount()>0&&m_route.getSublegCount()!=1?1:0);
                                 long timeInSeconds = tt.getDuration();
                                 long timeInMinutes = timeInSeconds/60;
-                                estimatedTime.append(timeInMinutes+"mins"+"\n");
+                                ///estimatedTime.append(timeInMinutes+"mins"+"\n");
 
                                 /* Add the MapRoute to the map */
                                 m_map.addMapObject(mapRoute);
@@ -231,13 +227,7 @@ public class MapFragmentView{
         });
     }
 
-    /*
-     * Android 8.0 (API level 26) limits how frequently background apps can retrieve the user's
-     * current location. Apps can receive location updates only a few times each hour.
-     * See href="https://developer.android.com/about/versions/oreo/background-location-limits.html
-     * In order to retrieve location updates more frequently start a foreground service.
-     * See https://developer.android.com/guide/components/services.html#Foreground
-     */
+
     private void startForegroundService() {
         if (!m_foregroundServiceStarted) {
             m_foregroundServiceStarted = true;
@@ -375,7 +365,6 @@ public class MapFragmentView{
         @Override
         public void onRouteUpdated(Route route) {
             //Toast.makeText(m_activity, "Route updated", Toast.LENGTH_SHORT).show();
-
         }
 
         @Override
