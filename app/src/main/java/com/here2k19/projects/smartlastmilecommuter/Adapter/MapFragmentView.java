@@ -29,6 +29,7 @@ import android.animation.ValueAnimator;
 import android.graphics.Point;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -54,7 +55,7 @@ import android.widget.Toast;
  */
 public class MapFragmentView{
     private SupportMapFragment m_mapFragment;
-    private MapActivity m_activity;
+    private FragmentActivity m_activity;
     TextView textView,estimatedTime;
     private Button m_naviControlButton;
     private Map m_map;
@@ -63,7 +64,7 @@ public class MapFragmentView{
     private Route m_route;
     private boolean m_foregroundServiceStarted;
     MapMarker mapMarker,mapMarker1;
-    public MapFragmentView(MapActivity activity) {
+    public MapFragmentView(FragmentActivity activity) {
         m_activity = activity;
         initMapFragment();
 

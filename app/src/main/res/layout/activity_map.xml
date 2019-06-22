@@ -15,6 +15,13 @@
         android:layout_above="@id/instructionscard"
         >
     </fragment>
+    <Button
+        android:layout_width="50dp"
+        android:visibility="gone"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_height="20dp"
+        android:background="@android:drawable/arrow_up_float"/>
     <android.support.v7.widget.CardView
         android:id="@+id/instructionscard"
         app:cardUseCompatPadding="true"
@@ -26,6 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
+                android:visibility="gone"
                 android:padding="5dp"
                 android:layout_toLeftOf="@id/tim"
                 android:id="@+id/maneveur"
@@ -41,16 +49,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 />
+
             <Button
-                android:layout_marginLeft="5dp"
-                android:layout_below="@id/maneveur"
-                android:layout_toRightOf="@id/orders"
                 android:id="@+id/naviCtrlButton"
-                android:text="simulation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                />
+                android:layout_marginLeft="5dp"
+                android:visibility="gone"
+                android:layout_toRightOf="@id/orders"
+                android:text="simulation" />
             <Button
+                android:visibility="gone"
                 android:layout_marginLeft="5dp"
                 android:layout_below="@id/maneveur"
                 android:layout_toRightOf="@id/naviCtrlButton"
@@ -71,4 +80,30 @@
                 android:layout_alignParentEnd="true" />
         </RelativeLayout>
     </android.support.v7.widget.CardView>
+    <Button
+        android:id="@+id/nextOrder"
+        android:text="NextOrder"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="100dp"
+        android:layout_width="wrap_content"
+        android:visibility="gone"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/simulate"
+        android:text="simulate"
+        android:visibility="gone"
+        android:layout_alignParentRight="true"
+        android:layout_above="@+id/nextOrder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+    <android.support.design.widget.FloatingActionButton
+        android:visibility="gone"
+        android:src="@drawable/ic_account_balance_black_24dp"
+        android:layout_width="wrap_content"
+        android:id="@+id/landmark"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_height="wrap_content" />
 </RelativeLayout>

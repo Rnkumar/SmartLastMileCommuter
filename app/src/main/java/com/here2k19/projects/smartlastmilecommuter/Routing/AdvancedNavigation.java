@@ -3,13 +3,17 @@ package com.here2k19.projects.smartlastmilecommuter.Routing;
 
 
 import android.os.Handler;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -58,33 +62,48 @@ import java.util.List;
 public class AdvancedNavigation extends NavigationManager.NewInstructionEventListener{
     private SupportMapFragment m_mapFragment;
     private Map m_map;
+    OrderCallback orderCallback;
 public static double deslatitude,deslongitude;
-    private MapMarker m_positionIndicatorFixed = null;
+    public static MapMarker m_positionIndicatorFixed = null;
     private PointF m_mapTransformCenter;
     private boolean m_returningToRoadViewMode = false;
     private double m_lastZoomLevelInRoadViewMode = 0.0;
     public static boolean isMarkerClicked=false;
-    private MapActivity m_activity;
-public NavigationManager navigationManager=null;
+    private FragmentActivity m_activity;
+public static NavigationManager navigationManager=null;
 RoutePlan getEtaRoutePlan;
-TextView time;
+TextView time,maneur;
 public static List<RouteResult> list1;
 ArrayList<Double> timeList;
 public static int Speed;
+CardView cardView;
+public static boolean navigationcheck=false;
+Button orders,startbtn,nextbtn;
 public static GeoCoordinate currentposition;
-    public AdvancedNavigation(MapActivity activity) {
-        m_activity = activity;
-     time=activity.findViewById(R.id.tim);
-     getEtaRoutePlan=new RoutePlan();
-        initMapFragment();
-        navigationManager=NavigationManager.getInstance();
-list1=new ArrayList<RouteResult>();
-   timeList=new ArrayList();
-        //getVoice();
+    public AdvancedNavigation(FragmentActivity activity) {
+            m_activity = activity;
+            time=activity.findViewById(R.id.tim);
+
+            cardView=m_activity.findViewById(R.id.instructionscard);
+      maneur=m_activity.findViewById(R.id.maneveur);
+      maneur.setVisibility(View.VISIBLE);
+            cardView.setVisibility(View.VISIBLE);
+            orders=m_activity.findViewById(R.id.orders);
+            nextbtn=m_activity.findViewById(R.id.nextOrder);
+            startbtn=m_activity.findViewById(R.id.navigation_btn);
+            orders.setVisibility(View.INVISIBLE);
+            startbtn.setVisibility(View.INVISIBLE);
+            getEtaRoutePlan=new RoutePlan();
+            initMapFragment();
+            navigationManager=NavigationManager.getInstance();
+            list1=new ArrayList<RouteResult>();
+            timeList=new ArrayList();
+
     }
     @Override
     public void onNewInstructionEvent() {
         super.onNewInstructionEvent();
+
         navigationManager=navigationManager;
         Maneuver maneuver = navigationManager.getNextManeuver();
         if (maneuver != null) {
@@ -128,9 +147,11 @@ list1=new ArrayList<RouteResult>();
                         if (error == OnEngineInitListener.Error.NONE) {
                             m_mapFragment.getMapGesture().addOnGestureListener(gestureListener, 100, true);
                             // retrieve a reference of the map from the map fragment
+                            navigationcheck=true;
                             m_map = m_mapFragment.getMap();
                             m_map.setZoomLevel(19);
                             m_map.addTransformListener(onTransformListener);
+
 
                             PositioningManager.getInstance().start(PositioningManager.LocationMethod.GPS_NETWORK);
 //                            final RoutePlan routePlan = new RoutePlan();
@@ -204,7 +225,8 @@ list1=new ArrayList<RouteResult>();
                                                     new WeakReference<NavigationManager.PositionListener>(positionListener));
                                             // start navigation simulation travelling at 13 meters per second
                                             navigationManager.simulate(route,60);
-                                         getVoice();
+
+                                            getVoice();
 
                                         } else {
                                             Toast.makeText(m_activity,

@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.here2k19.projects.smartlastmilecommuter">
-<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -17,14 +18,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".activities.MapCopyActivity"></activity>
         <activity android:name=".Delivery.GetDeliveries" />
-
-        <activity android:name=".activities.BusinessType">
-
-        </activity>
-        <activity android:name=".activities.MapActivity">
-
-        </activity>
+        <activity android:name=".activities.BusinessType"></activity>
+        <activity android:name=".activities.MapActivity"></activity>
         <activity android:name=".activities.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,9 +29,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Routing.Eta">
-
-        </activity>
+        <activity android:name=".Routing.Eta"></activity>
 
         <meta-data
             android:name="com.here.android.maps.appid"
@@ -49,17 +44,16 @@
         <service
             android:name="com.here.android.mpa.service.MapService"
             android:exported="false"
-
             android:label="BasicMapSolutionMapService">
             <intent-filter>
                 <action android:name="com.here2k19.projects.smartlastmilecommuter.MapService" />
             </intent-filter>
         </service>
         <service
+            android:name="com.here.services.internal.LocationService"
             android:enabled="true"
             android:exported="false"
-            android:name="com.here.services.internal.LocationService"
-            android:process=":remote"/>
+            android:process=":remote" />
+    </application>
 
-</application>
 </manifest>

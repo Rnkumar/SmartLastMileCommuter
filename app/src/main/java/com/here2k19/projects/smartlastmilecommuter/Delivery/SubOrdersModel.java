@@ -1,13 +1,47 @@
 package com.here2k19.projects.smartlastmilecommuter.Delivery;
 
 import java.util.Date;
+import java.util.List;
+
 
 public class SubOrdersModel {
 
-    private String mobile, Address, ItemName, Location, userId, orderId, driverName, driverMobile, driverId;
-    private Date date;
-    private boolean published, delivered;
-    private int quantity;
+    private String mobile;
+    private String Address;
+    private String ItemName;
+    private String Location;
+    private String userId;
+    private String orderId;
+    private String driverName;
+    private String driverMobile;
+    private List<LandMarkModel> landMarkModelList;
+
+    public List<LandMarkModel> getLandMarkModelList() {
+        return landMarkModelList;
+    }
+
+    public void setLandMarkModelList(List<LandMarkModel> landMarkModelList) {
+        this.landMarkModelList = landMarkModelList;
+    }
+
+    public SubOrdersModel(String mobile, String address, String itemName, String location, String userId, String orderId, String driverName, String driverMobile, List<LandMarkModel> landMarkModelList, String driverId, Date date, boolean published, boolean delivered, int quantity) {
+        this.mobile = mobile;
+        Address = address;
+        ItemName = itemName;
+        Location = location;
+        this.userId = userId;
+        this.orderId = orderId;
+        this.driverName = driverName;
+        this.driverMobile = driverMobile;
+        this.landMarkModelList = landMarkModelList;
+        this.driverId = driverId;
+        this.date = date;
+        this.published = published;
+        this.delivered = delivered;
+        this.quantity = quantity;
+    }
+
+
 
     public String getDriverId() {
         return driverId;
@@ -32,6 +66,12 @@ public class SubOrdersModel {
         this.delivered = delivered;
         this.quantity = quantity;
     }
+
+    private String driverId;
+    private Date date;
+    private boolean published, delivered;
+    private int quantity;
+
 
     public String getDriverName() {
         return driverName;
@@ -78,7 +118,7 @@ public class SubOrdersModel {
     public SubOrdersModel(String mobile, String address, String itemName, String location, String userId, boolean published, boolean delivered, int quantity, String orderId, Date date) {
         this.mobile = mobile;
         this.Address = address;
-        this.ItemName = itemName;http://localhost:5000/#/CreateItems
+        this.ItemName = itemName;
         this.Location = location;
         this.userId = userId;
         this.published = published;
@@ -158,10 +198,5 @@ public class SubOrdersModel {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
-    }
-
-    @Override
-    public String toString() {
-        return getItemName()+","+getAddress()+","+getDriverId()+","+getDriverMobile()+","+getDriverName()+","+getLocation()+","+getMobile()+","+getOrderId()+","+getUserId()+","+getDate()+","+getQuantity();
     }
 }

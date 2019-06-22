@@ -12,11 +12,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,7 +51,9 @@ import com.here.android.mpa.routing.RouteWaypoint;
 import com.here.android.mpa.routing.Router;
 import com.here.android.mpa.routing.RoutingError;
 import com.here2k19.projects.smartlastmilecommuter.Adapter.MapFragmentView;
+import com.here2k19.projects.smartlastmilecommuter.Delivery.GeoCoordinates;
 import com.here2k19.projects.smartlastmilecommuter.Delivery.GetDeliveries;
+import com.here2k19.projects.smartlastmilecommuter.Delivery.LandMarkModel;
 import com.here2k19.projects.smartlastmilecommuter.Delivery.SubOrdersModel;
 import com.here2k19.projects.smartlastmilecommuter.Geocoding.MainView;
 import com.here2k19.projects.smartlastmilecommuter.Notification.SendNotification;
@@ -57,10 +61,12 @@ import com.here2k19.projects.smartlastmilecommuter.R;
 import com.here2k19.projects.smartlastmilecommuter.Routing.AdvancedNavigation;
 import com.here2k19.projects.smartlastmilecommuter.Routing.Positioning;
 import com.here2k19.projects.smartlastmilecommuter.Routing.WaypointListener;
+import com.here2k19.projects.smartlastmilecommuter.Routing.WaypointWakeup;
 import com.here2k19.projects.smartlastmilecommuter.Routing.Waypoints;
 import com.here2k19.projects.smartlastmilecommuter.Utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -70,8 +76,11 @@ public class MapActivity extends FragmentActivity implements CoreRouter.Listener
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
     MapRoute ordersRoute;
     AppCompatActivity appCompatActivity;
+    Button nextOrder;
+    Button simulate;
     List<SubOrdersModel> productsList = GetDeliveries.staticProducstsList;
-
+int count=0;
+FloatingActionButton fab;
     private static final String[] REQUIRED_SDK_PERMISSIONS = new String[] {
             Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.WRITE_EXTERNAL_STORAGE };
     boolean value,value1=false;
@@ -79,10 +88,12 @@ AdvancedNavigation advancedNavigation;
     public static String vehicle="bike";
     private Map map = null;
     MapRoute adminLocationRoute;
-
+    int counter=1;
+    int execeptioncounter=1;
     private SupportMapFragment mapFragment = null;
     CoreRouter coreRouter;
-public static RoutePlan routePlanOrder;
+    MapMarker currentLocMarker;
+    public static RoutePlan routePlanOrder;
     public static GeoCoordinate currentloc,adminloc;
     double currentloclat,currentloclang;
     Button orders;
@@ -92,8 +103,9 @@ public static RoutePlan routePlanOrder;
     private MapMarker ordersMarker;
     public static List<GeoCoordinate> orderlist;
     private MapFragmentView m_mapFragmentView;
-    Button bt;
+    Button startBtn;
     TextView time;
+    CardView cardView;
     @Override
     public void onDestroy() {
         m_mapFragmentView.onDestroy();
@@ -127,20 +139,28 @@ public static RoutePlan routePlanOrder;
                     String name = sharedPreferences.getString("name","");
                     String mobile = sharedPreferences.getString("mobile","");
                     //SendNotification.notify(MapActivity.this,"push","Your items will be delivered by "+name+"("+mobile+")today.");
-                    Waypoints waypoints=new Waypoints();
-                    waypoints.getWaypoints(orderlocation, MapActivity.this, new WaypointListener() {
+                    WaypointWakeup waypoints=new WaypointWakeup();
+                    waypoints.getWaypointOkhttp(orderlocation, MapActivity.this, new WaypointListener() {
                         @Override
                         public void waypoints(List<GeoCoordinate> waypoints) {
                             orderlist = orderlocation;
                             drawRouteForOrder(waypoints);
+                            startBtn.setVisibility(View.VISIBLE);
+
                         }
 
                         @Override
                         public void waypointsError(String error) {
+                            Log.e("orderlocation",orderlocation.toString());
                             drawRouteForOrder(orderlocation);
+                            startBtn.setVisibility(View.VISIBLE);
                             Log.e("Error","Error:"+error);
                         }
                     });
+                }
+                else
+                {
+                    Log.e("orderlocationerror","enter");
                 }
             }
         });
@@ -194,8 +214,10 @@ public static RoutePlan routePlanOrder;
 
              }
                                 ArrayList<MapObject> markers = new ArrayList<MapObject>();
-                                markers.add(new MapMarker(new GeoCoordinate(currentloclat, currentloclang)).setTitle("ahii").setDescription("dfdf"));
-                                markers.add(new MapMarker(new GeoCoordinate(adminloc.getLatitude(), adminloc.getLongitude())).setTitle(adminloc.getLatitude()+","+adminloc.getLongitude()));
+
+                                currentLocMarker = new MapMarker(new GeoCoordinate(currentloclat, currentloclang)).setTitle("-1");
+                                markers.add(currentLocMarker);
+                                markers.add(new MapMarker(new GeoCoordinate(adminloc.getLatitude(), adminloc.getLongitude())).setTitle("-2"));
                                 map.addMapObjects(markers);
                                 currentloc = new GeoCoordinate(currentloclat,currentloclang);
                                 map.setCenter(new GeoCoordinate(currentloclat, currentloclang, 0.0),
@@ -216,10 +238,12 @@ public static RoutePlan routePlanOrder;
 
     private void getOrders() {
        orderlocation= new ArrayList<>();
+       currentloc = adminloc;
        orderlocation.add(adminloc);
        for(SubOrdersModel subOrdersModel:productsList){
            String[] ordersLocation = subOrdersModel.getLocation().split(",");
            Log.e("Orders",subOrdersModel.getLocation());
+           //orderlocation.add(new GeoCoordinate(currentloclat,currentloclang));
            orderlocation.add(new GeoCoordinate(Double.parseDouble(ordersLocation[0]),Double.parseDouble(ordersLocation[1].trim())));
        }
     }
@@ -234,12 +258,134 @@ public static RoutePlan routePlanOrder;
     }
     private void initialize() {
         setContentView(R.layout.activity_map);
-        bt=findViewById(R.id.navigation_btn);
+        cardView=findViewById(R.id.instructionscard);
+        startBtn=findViewById(R.id.navigation_btn);
         time=findViewById(R.id.tim);
-        bt.setOnClickListener(new View.OnClickListener() {
+        fab=findViewById(R.id.landmark);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                advancedNavigation=new AdvancedNavigation(MapActivity.this);
+                new AlertDialog.Builder(MapActivity.this).setMessage("Are you want to set the landmark")
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                for(int i=0;i<GetDeliveries.staticProducstsList.size()-1;i++)
+                                {
+                                    List<LandMarkModel> list=GetDeliveries.staticProducstsList.get(i).getLandMarkModelList();
+                                    ArrayList<MapObject> arrayList=new ArrayList<MapObject>();
+                                    arrayList.add(new MapMarker(new GeoCoordinate(list.get(i).geoCoordinates.getLatitude(),list.get(i).geoCoordinates.getLongitude())));
+                                    map.addMapObjects(arrayList);
+                                }
+
+
+                            }
+                        })
+                        .setNegativeButton("No",null).show();
+            }
+        });
+        nextOrder=findViewById(R.id.nextOrder);
+    simulate=findViewById(R.id.simulate);
+    simulate.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            advancedNavigation=new AdvancedNavigation(MapActivity.this);
+        }
+    });
+        nextOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(count!=0){
+                    if(AdvancedNavigation.navigationcheck)
+                    {
+                        AdvancedNavigation.navigationManager.stop();
+                        map.removeMapObject(ordersRoute);
+                        map.removeMapObject(AdvancedNavigation.m_positionIndicatorFixed);
+                    map.setTilt(45);
+
+
+                    }
+                 WaypointWakeup waypoints=new WaypointWakeup();
+                 waypoints.getWaypointOkhttp(orderlocation, MapActivity.this, new WaypointListener() {
+                     @Override
+                     public void waypoints(List<GeoCoordinate> waypoints) {
+                         if(counter<waypoints.size()-1)
+                         {
+                             ArrayList<GeoCoordinate> arrayList=new ArrayList<GeoCoordinate>();
+                             arrayList.add(waypoints.get(counter));
+                             arrayList.add(waypoints.get(counter+1));
+                    map.setCenter(arrayList.get(0), Map.Animation.LINEAR);
+                             drawRouteForOrder(arrayList);
+                             counter=counter+1;
+                         }
+                     }
+
+                     @Override
+                     public void waypointsError(String error) {
+                         Log.e("orderlocationsize",""+orderlocation.size());
+                        try {
+                            if (execeptioncounter < orderlocation.size() - 1) {
+                                ArrayList<GeoCoordinate> arrayList = new ArrayList<GeoCoordinate>();
+                                arrayList.add(orderlocation.get(execeptioncounter));
+                                arrayList.add(orderlocation.get(execeptioncounter + 1));
+                                map.setCenter(arrayList.get(0), Map.Animation.LINEAR);
+                                drawRouteForOrder(arrayList);
+                                execeptioncounter = execeptioncounter + 1;
+                    //            Log.e("exceptioncounter", String.valueOf(execeptioncounter));
+                      //          Log.e("arrayvalue", String.valueOf(orderlocation.get(execeptioncounter) + "\n" + orderlocation.get(execeptioncounter + 1)));
+                            }
+                        }
+                        catch (ArrayIndexOutOfBoundsException e)
+                        {
+
+                        }
+                     }
+                 });
+                }
+            }
+        });
+        startBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //  advancedNavigation=new AdvancedNavigation(MapActivity.this);
+                if (orderlocation != null) {
+                    cardView.setVisibility(View.GONE);
+                    WaypointWakeup waypoints = new WaypointWakeup();
+                    waypoints.getWaypointOkhttp(orderlocation, MapActivity.this, new WaypointListener() {
+                        @Override
+                        public void waypoints(List<GeoCoordinate> waypoints) {
+                            ArrayList<GeoCoordinate> arrayList=new ArrayList<GeoCoordinate>();
+                            if(count==0) {
+
+                                arrayList.add(waypoints.get(0));
+                                arrayList.add(waypoints.get(1));
+                                drawRouteForOrder(arrayList);
+                                nextOrder.setVisibility(View.VISIBLE);
+                                simulate.setVisibility(View.VISIBLE);
+
+                            count++;
+                            }
+
+                        }
+
+                        @Override
+                        public void waypointsError(String error) {
+                            ArrayList<GeoCoordinate> arrayList=new ArrayList<GeoCoordinate>();
+                            if(count==0) {
+                           //     CardView cardView=findViewById(R.id.instructionscard);
+                             //   cardView.setVisibility(View.INVISIBLE);
+                                //arrayList.add(new GeoCoordinate(currentloclat, currentloclang));
+                                arrayList.add(orderlocation.get(0));
+                                arrayList.add(orderlocation.get(1));
+                                drawRouteForOrder(arrayList);
+                                nextOrder.setVisibility(View.VISIBLE);
+                                simulate.setVisibility(View.VISIBLE);
+                                //startBtn.setVisibility(View.INVISIBLE);
+                                count++;
+                            }
+
+                        }
+                    });
+                }
             }
         });
         // Search for the map fragment to finish setup by calling init().
@@ -270,8 +416,8 @@ public static RoutePlan routePlanOrder;
                         currentloclang = Double.parseDouble(String.valueOf(Positioning.longitude));
 
                         if(currentloclat == 0.0 || currentloclang ==0.0){
-                            currentloclat = 13.043228;
-                            currentloclang = 77.609438;
+                            currentloclat = 19.123118;
+                            currentloclang = 73.017749;
                         }
                         Log.e("Current Location: ",currentloclat+","+currentloclang);
                         getAlert();
@@ -306,24 +452,65 @@ public static RoutePlan routePlanOrder;
                                     for (ViewObject viewObject : list) {
                                         if (viewObject.getBaseType() == ViewObject.Type.USER_OBJECT) {
                                             MapObject mapObject = (MapObject) viewObject;
-
                                             if (mapObject.getType() == MapObject.Type.MARKER) {
                                                 AdvancedNavigation.isMarkerClicked=true;
                                                 MapMarker window_marker = ((MapMarker) mapObject);
-                                                //AdvancedNavigation advancedNavigation=new AdvancedNavigation(MapActivity.this);
-                                               // advancedNavigation.getEta(AdvancedNavigation.currentposition,window_marker.getCoordinate());
-                                                String k=advancedNavigation.getEtaforBubble(AdvancedNavigation.currentposition,window_marker.getCoordinate());
                                                 View v = getLayoutInflater().inflate(R.layout.markerpopup,null);
-                                                final MapOverlay mapOverlay = new MapOverlay(v,window_marker.getCoordinate());
+                                                final MapOverlay mapOverlay = new MapOverlay(v,((MapMarker) mapObject).getCoordinate());
                                                 TextView info = v.findViewById(R.id.info);
+                                                Button bt=v.findViewById(R.id.landmarksbtn);
+                                                String k;
+                                                if(advancedNavigation!=null) {
+                                                    k = advancedNavigation.getEtaforBubble(AdvancedNavigation.currentposition, window_marker.getCoordinate());
+                                                }
+                                                else
+                                                {
+                                                    k=((MapMarker) mapObject).getTitle();
+                                                    if(k == null){
+                                                        break;
+                                                    }
+                                                    if(k.contains(",")){
+                                                        k = k.substring(k.indexOf(",")+1);
+                                                        info.setText(k);
+                                                    }else {
+                                                        int index = Integer.parseInt(k);
+                                                        if (index == -1) {
+                                                            info.setText("Current Location");
+                                                        } else if (index == -2 || index == 0) {
+                                                            info.setText("Admin Location");
+                                                        } else {
+                                                            SubOrdersModel model = GetDeliveries.staticProducstsList.get(index);
+                                                            String title = model.getItemName() + "\n" + model.getMobile();
+                                                            bt.setVisibility(View.VISIBLE);
+                                                            bt.setOnClickListener(new View.OnClickListener() {
+                                                                @Override
+                                                                public void onClick(View v) {
+                                                                    List<LandMarkModel> landMarkModels = model.getLandMarkModelList();
+                                                                    for (LandMarkModel landMarkModel : landMarkModels) {
+
+                                                                        GeoCoordinates geoCoordinates = landMarkModel.geoCoordinates;
+                                                                        MapMarker marker = new MapMarker(new GeoCoordinate(geoCoordinates.getLatitude(), geoCoordinates.getLongitude()));
+                                                                        marker.setTitle("-99," + landMarkModel.getName() + "\n" + landMarkModel.getAddress());
+                                                                        map.addMapObject(marker);
+                                                                        map.removeMapOverlay(mapOverlay);
+                                                                    }
+                                                                }
+                                                            });
+                                                            info.setText(title);
+                                                        }
+                                                    }
+                                                }
+
                                                 v.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
                                                     @Override
                                                     public void onClick(View v) {
                                                         map.removeMapOverlay(mapOverlay);
                                                     }
                                                 });
-                                               String[] split=k.split(":");
-                                                info.setText("Time\t:"+split[0]+"mins"+"\nDistance\t:"+split[1]);
+                                               //String[] split=k.split(":");
+                                                //info.setText("Time\t:"+split[0]+"mins"+"\nDistance\t:"+split[1]);
+
+                                                //info.setText(k);
                                                 map.addMapOverlay(mapOverlay);
 
                                             //    System.out.println("Title is................."+window_marker.getTitle());
@@ -517,10 +704,16 @@ for(int i=0;i<listOfValues.size();i++)
         });
     }
 
-private void drawRouteForOrder(List<GeoCoordinate> arrayList)
+public void drawRouteForOrder(List<GeoCoordinate> arrayList)
 {
     if(adminLocationRoute !=null){
+        if (currentLocMarker != null)
+        map.removeMapObject(currentLocMarker);
         map.removeMapObject(adminLocationRoute);
+    }
+    if(ordersRoute!=null)
+    {
+        map.removeMapObject(ordersRoute);
     }
     orderlist=arrayList;
     coreRouter=new CoreRouter();
@@ -583,6 +776,7 @@ private void drawRouteForOrder(List<GeoCoordinate> arrayList)
         }
     });
 }
+
     protected void checkPermissions() {
         final List<String> missingPermissions = new ArrayList<String>();
         // check all required dynamic permissions
@@ -644,7 +838,6 @@ private void drawRouteForOrder(List<GeoCoordinate> arrayList)
             map.addMapObject(mapRoute);
         }
     }
-
 
 
 }
